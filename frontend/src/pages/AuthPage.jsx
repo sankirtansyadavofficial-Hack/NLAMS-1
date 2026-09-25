@@ -490,8 +490,8 @@ export default function AuthPage() {
                 transition={{ duration: 0.3 }}
               >
                 <div className="mb-6">
-                  <h1 className="text-3xl font-black text-white mb-2">Create Account ✨</h1>
-                  <p className="text-white/50 text-sm">Join NLAMS — the national platform for transparent land governance.</p>
+                  <h1 className="text-3xl font-black text-[#1a1a2e] mb-2">Create Account ✨</h1>
+                  <p className="text-gray-500 text-sm">Join NLAMS — the national platform for transparent land governance.</p>
                 </div>
 
                 {/* Step indicator */}
@@ -501,18 +501,18 @@ export default function AuthPage() {
                       <div
                         className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all ${
                           step >= s
-                            ? 'bg-gradient-to-br from-amber-500 to-orange-600 text-white'
-                            : 'bg-white/10 text-white/40'
+                            ? 'bg-gradient-to-br from-amber-500 to-orange-600 text-white shadow-sm'
+                            : 'bg-gray-200 text-gray-500'
                         }`}
                       >
                         {step > s ? <CheckCircle size={14} /> : s}
                       </div>
                       {s < 2 && (
-                        <div className={`flex-1 h-0.5 rounded-full transition-all ${step > s ? 'bg-amber-500' : 'bg-white/10'}`} />
+                        <div className={`flex-1 h-0.5 rounded-full transition-all ${step > s ? 'bg-amber-500' : 'bg-gray-200'}`} />
                       )}
                     </React.Fragment>
                   ))}
-                  <span className="ml-2 text-white/40 text-xs">
+                  <span className="ml-2 text-gray-600 font-medium text-xs">
                     Step {step} of 2 — {step === 1 ? 'Personal Info' : 'Role & Access'}
                   </span>
                 </div>
@@ -578,10 +578,9 @@ export default function AuthPage() {
                           type="submit"
                           whileHover={{ scale: 1.02, y: -1 }}
                           whileTap={{ scale: 0.98 }}
-                          className="btn-glow w-full flex items-center justify-center gap-3 py-4 rounded-2xl text-base font-bold text-white"
+                          className="btn-glow w-full flex items-center justify-center gap-3 py-4 rounded-2xl text-base font-bold text-white shadow-md shadow-emerald-200"
                           style={{
                             background: 'linear-gradient(135deg, #10b981, #059669)',
-                            boxShadow: '0 8px 24px rgba(16,185,129,0.3)',
                           }}
                         >
                           Continue to Role Setup
@@ -600,7 +599,7 @@ export default function AuthPage() {
                       >
                         {/* Role selector */}
                         <div>
-                          <label className="block text-xs font-semibold text-white/60 uppercase tracking-wider mb-2">
+                          <label className="block text-xs font-semibold text-gray-600 uppercase tracking-wider mb-2">
                             Select Your Role
                           </label>
                           <div className="grid grid-cols-2 gap-2">
@@ -611,19 +610,19 @@ export default function AuthPage() {
                                 whileHover={{ scale: 1.02 }}
                                 whileTap={{ scale: 0.98 }}
                                 onClick={() => setSelectedRole(role.id)}
-                                className="relative flex items-center gap-2 p-3 rounded-2xl border text-left transition-all duration-200"
+                                className="relative flex items-center gap-2 p-3 rounded-2xl border text-left transition-all duration-200 bg-white"
                                 style={selectedRole === role.id ? {
                                   borderColor: role.color,
-                                  background: `${role.color}15`,
+                                  background: `${role.color}10`,
                                   boxShadow: `0 0 15px ${role.color}20`,
-                                } : { borderColor: 'rgba(255,255,255,0.1)' }}
+                                } : { borderColor: '#e5e7eb' }}
                               >
                                 <span className="text-xl">{role.emoji}</span>
                                 <div>
-                                  <div className={`text-xs font-bold ${selectedRole === role.id ? 'text-white' : 'text-white/60'}`}>
+                                  <div className={`text-xs font-bold ${selectedRole === role.id ? 'text-[#1a1a2e]' : 'text-gray-600'}`}>
                                     {role.label}
                                   </div>
-                                  <div className="text-white/30 text-[9px]">{role.desc}</div>
+                                  <div className="text-gray-400 text-[9px]">{role.desc}</div>
                                 </div>
                               </motion.button>
                             ))}
@@ -632,25 +631,25 @@ export default function AuthPage() {
 
                         {/* State */}
                         <div>
-                          <label className="block text-xs font-semibold text-white/60 uppercase tracking-wider mb-2">State / UT</label>
+                          <label className="block text-xs font-semibold text-gray-600 uppercase tracking-wider mb-2">State / UT</label>
                           <div className="relative">
-                            <MapPin size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-white/40" />
+                            <MapPin size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
                             <select
                               value={regForm.state}
                               onChange={(e) => setRegForm({ ...regForm, state: e.target.value })}
-                              className={`w-full pl-12 pr-4 py-4 rounded-2xl text-sm text-white outline-none transition-all appearance-none cursor-pointer
+                              className={`w-full pl-12 pr-4 py-4 rounded-2xl text-sm text-[#1a1a2e] outline-none transition-all appearance-none cursor-pointer bg-white
                                 ${errors.state
-                                  ? 'border-2 border-red-500/60 bg-red-500/5'
-                                  : 'border border-white/10 bg-white/5 focus:border-emerald-500/60 focus:bg-emerald-500/5'
+                                  ? 'border-2 border-red-400'
+                                  : 'border border-gray-200 focus:border-emerald-500'
                                 }`}
                             >
-                              <option value="" className="bg-gray-900">Select State / UT</option>
+                              <option value="" className="bg-white text-gray-700">Select State / UT</option>
                               {states.map((s) => (
-                                <option key={s} value={s} className="bg-gray-900">{s}</option>
+                                <option key={s} value={s} className="bg-white text-[#1a1a2e]">{s}</option>
                               ))}
                             </select>
                           </div>
-                          {errors.state && <p className="text-red-400 text-xs mt-1">{errors.state}</p>}
+                          {errors.state && <p className="text-red-500 text-xs mt-1">{errors.state}</p>}
                         </div>
 
                         {/* Employee ID (optional for some roles) */}
@@ -670,7 +669,7 @@ export default function AuthPage() {
                             whileHover={{ scale: 1.02 }}
                             whileTap={{ scale: 0.98 }}
                             onClick={() => setStep(1)}
-                            className="flex-1 py-4 rounded-2xl text-sm font-semibold text-white/60 border border-white/10 hover:border-white/30 hover:text-white transition-all"
+                            className="flex-1 py-4 rounded-2xl text-sm font-semibold text-gray-600 border border-gray-200 hover:border-gray-400 hover:bg-gray-100 transition-all"
                           >
                             Back
                           </motion.button>
@@ -679,10 +678,9 @@ export default function AuthPage() {
                             whileHover={{ scale: 1.02, y: -1 }}
                             whileTap={{ scale: 0.98 }}
                             disabled={loading}
-                            className="btn-glow flex-[2] flex items-center justify-center gap-3 py-4 rounded-2xl text-base font-bold text-white disabled:opacity-70"
+                            className="btn-glow flex-[2] flex items-center justify-center gap-3 py-4 rounded-2xl text-base font-bold text-white disabled:opacity-70 shadow-md shadow-orange-200"
                             style={{
                               background: loading ? 'rgba(245,158,11,0.5)' : 'linear-gradient(135deg, #f59e0b, #ef4444)',
-                              boxShadow: '0 8px 24px rgba(245,158,11,0.3)',
                             }}
                           >
                             {loading ? (
@@ -697,17 +695,17 @@ export default function AuthPage() {
                   </AnimatePresence>
                 </form>
 
-                <p className="text-center text-white/40 text-xs mt-6">
+                <p className="text-center text-gray-500 text-xs mt-6">
                   Already have an account?{' '}
                   <button
                     onClick={() => setTab('login')}
-                    className="text-amber-400 hover:text-amber-300 font-semibold transition-colors"
+                    className="text-[#FF9933] hover:text-[#E07800] font-semibold transition-colors"
                   >
                     Sign in
                   </button>
                 </p>
 
-                <p className="text-center text-white/25 text-[10px] mt-4 leading-relaxed">
+                <p className="text-center text-gray-400 text-[10px] mt-4 leading-relaxed">
                   By registering, you agree to the Government of India's Terms of Service.
                   <br />
                   Your data is protected under the Digital Personal Data Protection Act, 2023.
