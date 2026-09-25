@@ -12,6 +12,7 @@ Intelligent conversational assistant that:
 import os
 import re
 import json
+import time
 import logging
 from typing import List, Dict, Any, Optional
 from pydantic import BaseModel, Field
@@ -145,7 +146,7 @@ def rule_based_navigator(
     q = query.lower()
     
     # 1. Grievances, delays, complaints, and officer escalation (HIGHEST PRIORITY)
-    if any(k in q for k in ["grievance", "shikayat", "complaint", "delay", "deri", "nahi aaya", "help", "sahayata", "officer", "kisko"]):
+    if any(k in q for k in ["grievance", "shikayat", "complaint", "delay", "deri", "nahi aaya", "help", "sahayata", "officer", "officical", "kisko", "steal", "fraud", "corrupt", "bribe"]):
         reply = (
             "For complaints regarding delayed compensation, missing awards, or unaddressed objections:\n\n"
             "1. Visit the **Farmer Dashboard** (/farmer-dashboard) to lodge your grievance in Hindi, English, or your local dialect.\n"
@@ -257,28 +258,47 @@ def rule_based_navigator(
             problem_category="PORTAL_NAVIGATION"
         )
 
-    # Default welcoming response
+    # 6. Greetings
+    if any(k in q for k in ["hi", "hello", "namaste", "hey", "help", "start"]):
+        reply = (
+            "Namaste! I am the **NLAMS AI Sahayak & Web Navigator**.\n\n"
+            "I can help you navigate this portal and answer questions on:\n"
+            "• **Fair Compensation & Valuation:** RFCTLARR Act 2013 rules, circle rates, and 100% Solatium.\n"
+            "• **Grievance Redressal:** Checking disbursement delays or filing objections under Section 15.\n"
+            "• **Boundary & Map Verification:** Detecting forest/highway overlaps on the GIS map.\n"
+            "• **Direct Navigation:** Jump to Farmer, District, State, or National dashboards.\n\n"
+            "How can I assist you with your land acquisition inquiry today?"
+        )
+        return NavigatorChatResponse(
+            reply=reply,
+            navigation_action=None,
+            suggested_links=[
+                NavigatorLink(title="Farmer & Landowner Portal", url="/farmer-dashboard"),
+                NavigatorLink(title="District LAO Dashboard", url="/district-dashboard"),
+                NavigatorLink(title="National Monitoring", url="/dashboard")
+            ],
+            suggested_questions=[
+                "Meri zameen ka survey status kaise check karein?",
+                "How is compensation calculated under RFCTLARR 2013?",
+                "How do I check boundary overlaps on the map?"
+            ],
+            problem_category="GENERAL_INQUIRY"
+        )
+
+    # 7. Out of scope / Anonymous Queries
     reply = (
-        "Namaste! I am the **NLAMS AI Sahayak & Web Navigator**.\n\n"
-        "I can help you navigate this portal and answer questions on:\n"
-        "• **Fair Compensation & Valuation:** RFCTLARR Act 2013 rules, circle rates, and 100% Solatium.\n"
-        "• **Grievance Redressal:** Checking disbursement delays or filing objections under Section 15.\n"
-        "• **Boundary & Map Verification:** Detecting forest/highway overlaps on the GIS map.\n"
-        "• **Direct Navigation:** Jump to Farmer, District, State, or National dashboards.\n\n"
-        "How can I assist you with your land acquisition inquiry today?"
+        "I'm sorry, but as the **NLAMS AI Sahayak**, I am specifically programmed to assist only with matters related to **Land Acquisition, RFCTLARR Act 2013, Compensation Valuation, and Portal Navigation**.\n\n"
+        "I cannot answer general knowledge questions, personal inquiries, or unrelated topics.\n\n"
+        "Please ask me a question related to land acquisition, or click one of the suggested topics below."
     )
     return NavigatorChatResponse(
         reply=reply,
-        navigation_action="/farmer-dashboard",
-        suggested_links=[
-            NavigatorLink(title="Farmer & Landowner Portal", url="/farmer-dashboard"),
-            NavigatorLink(title="District LAO Dashboard", url="/district-dashboard"),
-            NavigatorLink(title="National Monitoring", url="/dashboard")
-        ],
+        navigation_action=None,
+        suggested_links=[],
         suggested_questions=[
-            "Meri zameen ka survey status kaise check karein?",
             "How is compensation calculated under RFCTLARR 2013?",
-            "How do I check boundary overlaps on the map?"
+            "Where can I file a grievance?",
+            "How do I verify parcel boundaries?"
         ],
         problem_category="GENERAL_INQUIRY"
     )
@@ -290,6 +310,7 @@ def process_navigator_chat(request: NavigatorChatRequest) -> NavigatorChatRespon
     
     if not api_key:
         logger.info("GEMINI_API_KEY not configured. Using deterministic rules navigator.")
+        time.sleep(1.2) # Simulate processing delay
         return rule_based_navigator(request.query, request.current_path or "/", request.user_role or "citizen")
     
     try:
@@ -333,7 +354,7 @@ RULES:
         )
 
         response = client.models.generate_content(
-            model="gemini-2.5-flash",
+            model="gemini-3.8-flash",
             contents=prompt,
             config=types.GenerateContentConfig(
                 system_instruction=system_instruction,

@@ -1,1 +1,8 @@
-const express = require('express');\nconst router = express.Router();\nconst controller = require('../controllers/notification.controller');\nrouter.get('/', controller.dummy);\nmodule.exports = router;
+const express = require('express');
+const router = express.Router();
+const controller = require('../controllers/notification.controller');
+
+// GET /api/notifications?user_id=... — Get notifications for a user
+router.get('/', controller.getNotifications);
+
+module.exports = router;

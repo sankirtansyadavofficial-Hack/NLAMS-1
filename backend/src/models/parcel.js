@@ -8,7 +8,7 @@ class Parcel {
         'features', json_agg(ST_AsGeoJSON(t.*)::json)
       ) AS geojson
       FROM (
-        SELECT id, plot_number, owner_name, owner_phone, owner_aadhaar, owner_address, parcel_area, valuation, usage, owner_color, latitude, longitude, geom FROM land_parcels
+        SELECT id, plot_number, khasra_number, khata_number, mutation_status, owner_name, owner_phone, owner_aadhaar, owner_address, parcel_area, valuation, usage, owner_color, latitude, longitude, geom FROM land_parcels
       ) AS t;
     `;
     const { rows } = await pool.query(query);
@@ -17,7 +17,7 @@ class Parcel {
 
   static async findByPlotNumber(plotNumber) {
     const query = `
-      SELECT id, plot_number, owner_name, owner_phone, owner_aadhaar, owner_address, parcel_area, valuation, usage, owner_color, latitude, longitude, ST_AsGeoJSON(geom)::json AS geometry
+      SELECT id, plot_number, khasra_number, khata_number, mutation_status, owner_name, owner_phone, owner_aadhaar, owner_address, parcel_area, valuation, usage, owner_color, latitude, longitude, ST_AsGeoJSON(geom)::json AS geometry
       FROM land_parcels
       WHERE plot_number = $1;
     `;

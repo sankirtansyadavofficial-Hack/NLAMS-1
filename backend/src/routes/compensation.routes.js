@@ -1,1 +1,11 @@
-const express = require('express');\nconst router = express.Router();\nconst controller = require('../controllers/compensation.controller');\nrouter.get('/', controller.dummy);\nmodule.exports = router;
+const express = require('express');
+const router = express.Router();
+const controller = require('../controllers/compensation.controller');
+
+// GET /api/compensations?parcel_id=... — Get compensation by parcel
+router.get('/', controller.getCompensation);
+
+// GET /api/compensations/stats — Aggregated compensation stats
+router.get('/stats', controller.getStats);
+
+module.exports = router;

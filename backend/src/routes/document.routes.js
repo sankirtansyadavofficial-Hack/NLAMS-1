@@ -1,1 +1,8 @@
-const express = require('express');\nconst router = express.Router();\nconst controller = require('../controllers/document.controller');\nrouter.get('/', controller.dummy);\nmodule.exports = router;
+const express = require('express');
+const router = express.Router();
+const controller = require('../controllers/document.controller');
+
+// GET /api/documents?parcel_id=... — Get documents for a parcel
+router.get('/', controller.getDocuments);
+
+module.exports = router;
