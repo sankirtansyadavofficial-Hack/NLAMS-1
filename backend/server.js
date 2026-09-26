@@ -21,6 +21,7 @@ app.use(cors({
     'http://localhost:5173',     // Vite dev server
     'http://localhost:4173',     // Vite preview
     'http://127.0.0.1:5173',
+    'https://niladri21.github.io',
     process.env.FRONTEND_URL,   // production URL (set via env)
   ].filter(Boolean),
   credentials: true,
