@@ -6,6 +6,7 @@ import {
   MapPin, ArrowRight, CheckCircle, Shield, Globe,
   ChevronRight, Loader2
 } from 'lucide-react';
+import heroFarmImage from '../assets/hero-farm.png';
 
 const roles = [
   { id: 'central', label: 'Central Ministry', emoji: '🏛️', color: '#003580', desc: 'Ministry of Land Resources' },
@@ -186,7 +187,7 @@ export default function AuthPage() {
         {/* Background image */}
         <div
           className="absolute inset-0 bg-cover bg-center"
-          style={{ backgroundImage: "url('/hero-farm.png')" }}
+          style={{ backgroundImage: `url(${heroFarmImage})` }}
         />
         <div className="absolute inset-0" style={{
           background: 'linear-gradient(135deg, rgba(5,11,20,0.85) 0%, rgba(5,30,15,0.75) 50%, rgba(5,11,20,0.9) 100%)'

@@ -7,6 +7,7 @@ import {
   FileText, BarChart3, Building2, Award,
   ChevronRight, Database, Smartphone, Pause, Volume2, VolumeX
 } from 'lucide-react';
+import heroFarmImage from '../assets/hero-farm.png';
 
 // ── Tiranga Particle Field ────────────────────────────────────────────────────
 function ParticleField() {
@@ -396,7 +397,7 @@ export default function HomePage() {
         <motion.div style={{ y: bgY }} className="absolute inset-0 z-0">
           <div
             className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-            style={{ backgroundImage: "url('/hero-farm.png')", transform: 'scale(1.1)' }}
+            style={{ backgroundImage: `url(${heroFarmImage})`, transform: 'scale(1.1)' }}
           />
           {/* Multi-layer overlay - darker for Indian golden hour feel */}
           <div className="absolute inset-0" style={{
