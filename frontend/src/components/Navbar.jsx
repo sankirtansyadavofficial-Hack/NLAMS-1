@@ -32,6 +32,24 @@ export default function Navbar() {
   const location = useLocation();
   const { loginWithRedirect, logout, isAuthenticated, user } = useAuth0();
 
+  const handleSignIn = async () => {
+    try {
+      await loginWithRedirect({ appState: { returnTo: '/district-dashboard' } });
+    } catch (err) {
+      console.warn('Auth0 redirect error, falling back to /auth:', err);
+      navigate('/auth');
+    }
+  };
+
+  const handleSignUp = async () => {
+    try {
+      await loginWithRedirect({ authorizationParams: { screen_hint: 'signup' } });
+    } catch (err) {
+      console.warn('Auth0 signup redirect error, falling back to /auth:', err);
+      navigate('/auth?tab=register');
+    }
+  };
+
   const isHome = location.pathname === '/';
   const isNavSolid = scrolled || !isHome;
 
@@ -177,7 +195,7 @@ export default function Navbar() {
                   <motion.button
                     whileHover={{ scale: 1.04 }}
                     whileTap={{ scale: 0.96 }}
-                    onClick={() => loginWithRedirect({ appState: { returnTo: '/district-dashboard' } })}
+                    onClick={handleSignIn}
                     className={`px-5 py-2.5 rounded-xl text-sm font-semibold transition-all border ${
                       isNavSolid
                         ? 'text-[#003580] border-[#003580]/30 hover:bg-[#003580]/5'
@@ -190,7 +208,7 @@ export default function Navbar() {
                   <motion.button
                     whileHover={{ scale: 1.05, y: -1 }}
                     whileTap={{ scale: 0.96 }}
-                    onClick={() => loginWithRedirect({ authorizationParams: { screen_hint: 'signup' } })}
+                    onClick={handleSignUp}
                     className="btn-glow px-5 py-2.5 rounded-xl text-sm font-bold text-white shadow-lg"
                     style={{
                       background: 'linear-gradient(135deg, #FF9933, #E07800)',
@@ -289,13 +307,13 @@ export default function Navbar() {
                   {!isAuthenticated ? (
                     <>
                       <button
-                        onClick={() => loginWithRedirect({ appState: { returnTo: '/district-dashboard' } })}
+                        onClick={handleSignIn}
                         className="w-full py-3 rounded-xl text-sm font-semibold text-[#003580] border border-[#003580]/30 hover:bg-blue-50 transition-all"
                       >
                         Sign In
                       </button>
                       <button
-                        onClick={() => loginWithRedirect({ authorizationParams: { screen_hint: 'signup' } })}
+                        onClick={handleSignUp}
                         className="w-full py-3 rounded-xl text-sm font-bold text-white"
                         style={{ background: 'linear-gradient(135deg, #FF9933, #E07800)' }}
                       >
