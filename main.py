@@ -257,11 +257,18 @@ def api_generate_award_summary(request: ProjectAwardData):
 
 @app.get(
     "/api/v1/download-report/{filename:path}",
-    tags=["Feature 5 - Executive Award & R&R Reports"]
+    response_class=FileResponse,
+    tags=["Feature 5 - Executive Award & R&R Reports"],
+    responses={
+        200: {
+            "content": {"application/pdf": {}},
+            "description": "Bilingual Executive Land Acquisition & Award PDF Report"
+        }
+    }
 )
 def api_download_report(filename: str):
     """
-    Downloads or renders the generated executive PDF report.
+    Downloads the generated executive PDF report directly as an attachment.
     Resiliently accepts bare filename, full path, or URL path.
     """
     import urllib.parse
@@ -278,7 +285,7 @@ def api_download_report(filename: str):
         path=file_path,
         media_type="application/pdf",
         filename=safe_filename,
-        content_disposition_type="inline"
+        content_disposition_type="attachment"
     )
 
 
