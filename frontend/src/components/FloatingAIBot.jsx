@@ -102,7 +102,7 @@ export default function FloatingAIBot() {
 
     try {
       // Connect to FastAPI AI Engine endpoint
-      const response = await fetch('http://localhost:8000/api/v1/navigator-chat', {
+      const response = await fetch(`${import.meta.env.VITE_AI_URL || 'http://localhost:8000'}/api/v1/navigator-chat`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

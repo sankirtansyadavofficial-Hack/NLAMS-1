@@ -149,7 +149,7 @@ export default function GisLandMapPage() {
 
   // 1. Fetch All Parcels from Backend on Mount
   useEffect(() => {
-    fetch('http://localhost:3000/api/parcels')
+    fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3000'}/api/parcels`)
       .then(res => res.json())
       .then(data => {
         setDbParcels(data);
@@ -172,7 +172,7 @@ export default function GisLandMapPage() {
     setSearchResults([]);
 
     try {
-      const res = await fetch(`http://localhost:3000/api/parcels/search?plot_number=${encodeURIComponent(target)}`);
+      const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3000'}/api/parcels/search?plot_number=${encodeURIComponent(target)}`);
       if (!res.ok) throw new Error(`Plot "${target}" not found in cadastral registry.`);
       const plot = await res.json();
 
@@ -253,7 +253,7 @@ export default function GisLandMapPage() {
     setIsVerifying(true);
 
     try {
-      const response = await fetch('http://localhost:8000/api/v1/verify-geometry', {
+      const response = await fetch(`${import.meta.env.VITE_AI_URL || 'http://localhost:8000'}/api/v1/verify-geometry`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

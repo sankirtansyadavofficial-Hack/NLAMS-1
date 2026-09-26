@@ -76,7 +76,7 @@ function LandMiniMap() {
   const [geoData, setGeoData] = React.useState(null);
 
   React.useEffect(() => {
-    fetch('http://localhost:3000/api/parcels')
+    fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3000'}/api/parcels`)
       .then(res => res.json())
       .then(data => setGeoData(data))
       .catch(err => console.error("Error fetching map data:", err));

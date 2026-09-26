@@ -376,7 +376,7 @@ function PlotSearchMap() {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    fetch('http://localhost:3000/api/parcels')
+    fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3000'}/api/parcels`)
       .then(res => res.json())
       .then(data => setGeoData(data))
       .catch(err => console.error("Error fetching map data:", err));
@@ -387,7 +387,7 @@ function PlotSearchMap() {
     setError(null);
     setSearchedData(null);
     try {
-      const res = await fetch(`http://localhost:3000/api/parcels/search?plot_number=${searchPlot}`);
+      const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3000'}/api/parcels/search?plot_number=${searchPlot}`);
       if (!res.ok) throw new Error('Plot not found');
       const data = await res.json();
       setSearchedData(data);
