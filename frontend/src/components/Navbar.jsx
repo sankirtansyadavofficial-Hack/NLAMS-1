@@ -2,9 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import {
-  Menu, X, ChevronDown, Bell,
+  Menu, X, ChevronDown, Bell, LogOut,
   LayoutDashboard, FileText, Map, Shield, Globe
 } from 'lucide-react';
+import { useAuth0 } from '@auth0/auth0-react';
 
 const navLinks = [
   { label: 'Home', path: '/', hasDropdown: false },
@@ -29,6 +30,7 @@ export default function Navbar() {
   const [activeDropdown, setActiveDropdown] = useState(null);
   const navigate = useNavigate();
   const location = useLocation();
+  const { loginWithRedirect, logout, isAuthenticated, user } = useAuth0();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 60);
@@ -167,31 +169,51 @@ export default function Navbar() {
                 <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-[#FF9933] rounded-full animate-pulse" />
               </motion.button>
 
-              <motion.button
-                whileHover={{ scale: 1.04 }}
-                whileTap={{ scale: 0.96 }}
-                onClick={() => navigate('/auth')}
-                className={`px-5 py-2.5 rounded-xl text-sm font-semibold transition-all border ${
-                  scrolled
-                    ? 'text-[#003580] border-[#003580]/30 hover:bg-[#003580]/5'
-                    : 'text-white border-white/30 hover:bg-white/10'
-                }`}
-              >
-                Sign In
-              </motion.button>
+              {!isAuthenticated ? (
+                <>
+                  <motion.button
+                    whileHover={{ scale: 1.04 }}
+                    whileTap={{ scale: 0.96 }}
+                    onClick={() => loginWithRedirect()}
+                    className={`px-5 py-2.5 rounded-xl text-sm font-semibold transition-all border ${
+                      scrolled
+                        ? 'text-[#003580] border-[#003580]/30 hover:bg-[#003580]/5'
+                        : 'text-white border-white/30 hover:bg-white/10'
+                    }`}
+                  >
+                    Sign In
+                  </motion.button>
 
-              <motion.button
-                whileHover={{ scale: 1.05, y: -1 }}
-                whileTap={{ scale: 0.96 }}
-                onClick={() => navigate('/auth?tab=register')}
-                className="btn-glow px-5 py-2.5 rounded-xl text-sm font-bold text-white shadow-lg"
-                style={{
-                  background: 'linear-gradient(135deg, #FF9933, #E07800)',
-                  boxShadow: '0 4px 18px rgba(255,153,51,0.35)',
-                }}
-              >
-                Get Started
-              </motion.button>
+                  <motion.button
+                    whileHover={{ scale: 1.05, y: -1 }}
+                    whileTap={{ scale: 0.96 }}
+                    onClick={() => loginWithRedirect({ authorizationParams: { screen_hint: 'signup' } })}
+                    className="btn-glow px-5 py-2.5 rounded-xl text-sm font-bold text-white shadow-lg"
+                    style={{
+                      background: 'linear-gradient(135deg, #FF9933, #E07800)',
+                      boxShadow: '0 4px 18px rgba(255,153,51,0.35)',
+                    }}
+                  >
+                    Get Started
+                  </motion.button>
+                </>
+              ) : (
+                <div className="flex items-center gap-4">
+                  <div className={`flex items-center gap-2 ${scrolled ? 'text-gray-700' : 'text-white'}`}>
+                    <img src={user.picture} alt={user.name} className="w-8 h-8 rounded-full border border-[#FF9933]" />
+                    <span className="text-sm font-semibold">{user.name}</span>
+                  </div>
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => logout({ logoutParams: { returnTo: window.location.origin } })}
+                    className={`p-2 rounded-xl text-red-500 hover:bg-red-500/10 transition-all flex items-center gap-1 text-sm font-semibold`}
+                  >
+                    <LogOut size={16} />
+                    Logout
+                  </motion.button>
+                </div>
+              )}
             </div>
 
             {/* Mobile burger */}
@@ -261,19 +283,31 @@ export default function Navbar() {
                   </div>
                 ))}
                 <div className="pt-4 flex flex-col gap-3 border-t border-orange-100">
-                  <button
-                    onClick={() => navigate('/auth')}
-                    className="w-full py-3 rounded-xl text-sm font-semibold text-[#003580] border border-[#003580]/30 hover:bg-blue-50 transition-all"
-                  >
-                    Sign In
-                  </button>
-                  <button
-                    onClick={() => navigate('/auth?tab=register')}
-                    className="w-full py-3 rounded-xl text-sm font-bold text-white"
-                    style={{ background: 'linear-gradient(135deg, #FF9933, #E07800)' }}
-                  >
-                    Get Started Free
-                  </button>
+                  {!isAuthenticated ? (
+                    <>
+                      <button
+                        onClick={() => loginWithRedirect()}
+                        className="w-full py-3 rounded-xl text-sm font-semibold text-[#003580] border border-[#003580]/30 hover:bg-blue-50 transition-all"
+                      >
+                        Sign In
+                      </button>
+                      <button
+                        onClick={() => loginWithRedirect({ authorizationParams: { screen_hint: 'signup' } })}
+                        className="w-full py-3 rounded-xl text-sm font-bold text-white"
+                        style={{ background: 'linear-gradient(135deg, #FF9933, #E07800)' }}
+                      >
+                        Get Started Free
+                      </button>
+                    </>
+                  ) : (
+                    <button
+                      onClick={() => logout({ logoutParams: { returnTo: window.location.origin } })}
+                      className="w-full flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-semibold text-red-500 border border-red-500/30 hover:bg-red-50 transition-all"
+                    >
+                      <LogOut size={16} />
+                      Logout
+                    </button>
+                  )}
                 </div>
               </div>
             </motion.div>
