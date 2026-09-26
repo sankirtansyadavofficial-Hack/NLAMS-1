@@ -8,7 +8,8 @@ const domain = import.meta.env.VITE_AUTH0_DOMAIN;
 const clientId = import.meta.env.VITE_AUTH0_CLIENT_ID;
 
 const onRedirectCallback = (appState) => {
-  window.location.replace(appState?.returnTo || '/district-dashboard');
+  // With HashRouter, navigate using hash
+  window.location.hash = appState?.returnTo || '/district-dashboard';
 };
 
 createRoot(document.getElementById('root')).render(
