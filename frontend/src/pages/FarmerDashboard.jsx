@@ -16,7 +16,6 @@ import {
   farmerProfile, landParcel, acquisitionSteps, compensationData,
   rrStatus, documents, grievances, grievanceTypes, labels
 } from '../data/farmerData';
-import { getAllParcels } from '../services/api';
 import AIChatbot from '../components/AIChatbot';
 
 // Fix default marker icon
@@ -43,10 +42,10 @@ const FadeIn = ({ children, delay = 0, className = '' }) => (
 function StatusBadge({ value, lang }) {
   const t = labels[lang];
   const cfgMap = {
-    Yes:     { bg: 'bg-emerald-500/15', text: 'text-emerald-400', border: 'border-emerald-500/30', icon: <CheckCircle2 size={12} />, label: t.yes },
-    No:      { bg: 'bg-red-500/15', text: 'text-red-400', border: 'border-red-500/30', icon: <XCircle size={12} />, label: t.no },
-    Pending: { bg: 'bg-amber-500/15', text: 'text-amber-400', border: 'border-amber-500/30', icon: <Clock size={12} />, label: t.pending },
-    Paid:    { bg: 'bg-emerald-500/15', text: 'text-emerald-400', border: 'border-emerald-500/30', icon: <CheckCircle2 size={12} />, label: t.paid },
+    Yes:     { bg: 'bg-emerald-100', text: 'text-emerald-700', border: 'border-emerald-200', icon: <CheckCircle2 size={12} />, label: t.yes },
+    No:      { bg: 'bg-red-100', text: 'text-red-700', border: 'border-red-200', icon: <XCircle size={12} />, label: t.no },
+    Pending: { bg: 'bg-amber-100', text: 'text-amber-700', border: 'border-amber-200', icon: <Clock size={12} />, label: t.pending },
+    Paid:    { bg: 'bg-emerald-100', text: 'text-emerald-700', border: 'border-emerald-200', icon: <CheckCircle2 size={12} />, label: t.paid },
   };
   const c = cfgMap[value] || cfgMap.Pending;
   return (
@@ -66,7 +65,7 @@ function AcquisitionBadge({ status }) {
     'R&R': 'from-cyan-500 to-cyan-600',
   };
   return (
-    <span className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-black text-white bg-gradient-to-r ${colors[status] || colors.Compensation} shadow-lg`}>
+    <span className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-black text-white bg-gradient-to-r ${colors[status] || colors.Compensation} shadow-md`}>
       <CircleDot size={14} className="animate-pulse" />
       {status} Stage
     </span>
@@ -77,13 +76,14 @@ function LandMiniMap() {
   const [geoData, setGeoData] = React.useState(null);
 
   React.useEffect(() => {
-    getAllParcels()
+    fetch('http://localhost:3000/api/parcels')
+      .then(res => res.json())
       .then(data => setGeoData(data))
       .catch(err => console.error("Error fetching map data:", err));
   }, []);
 
   return (
-    <div className="h-52 rounded-xl overflow-hidden border border-white/10 relative">
+    <div className="h-52 rounded-xl overflow-hidden border border-gray-200 relative">
       <MapContainer
         center={[21.1458, 79.0882]}
         zoom={14}
@@ -100,13 +100,13 @@ function LandMiniMap() {
           <GeoJSON 
             data={geoData} 
             style={{
-              color: '#f59e0b',
+              color: '#FF9933',
               weight: 2,
-              fillColor: '#f59e0b',
+              fillColor: '#FF9933',
               fillOpacity: 0.4
             }}
             onEachFeature={(feature, layer) => {
-              layer.bindPopup(`<strong>${feature.properties.owner_name}</strong><br/>Area: ${feature.properties.parcel_area} acres`);
+              layer.bindPopup(`<strong style="color:#1a1a2e">${feature.properties.owner_name}</strong><br/>Area: ${feature.properties.parcel_area} acres`);
             }}
           />
         )}
@@ -124,7 +124,7 @@ function AcquisitionStepper({ lang }) {
       {/* Desktop stepper */}
       <div className="hidden md:flex items-start justify-between relative">
         {/* Connecting line */}
-        <div className="absolute top-6 left-[10%] right-[10%] h-0.5 bg-white/10" />
+        <div className="absolute top-6 left-[10%] right-[10%] h-0.5 bg-gray-200" />
         <div
           className="absolute top-6 left-[10%] h-0.5 bg-gradient-to-r from-emerald-500 to-amber-500 transition-all duration-1000"
           style={{
@@ -148,40 +148,40 @@ function AcquisitionStepper({ lang }) {
               {/* Circle */}
               <div className={`w-12 h-12 rounded-full flex items-center justify-center border-2 transition-all duration-500 ${
                 isCompleted
-                  ? 'bg-emerald-500 border-emerald-400 shadow-lg shadow-emerald-500/30'
+                  ? 'bg-emerald-500 border-emerald-400 shadow-md shadow-emerald-200'
                   : isCurrent
-                    ? 'bg-amber-500 border-amber-400 shadow-lg shadow-amber-500/40 animate-pulse'
-                    : 'bg-white/5 border-white/20'
+                    ? 'bg-amber-500 border-amber-400 shadow-md shadow-orange-200 animate-pulse'
+                    : 'bg-gray-100 border-gray-300'
               }`}>
                 {isCompleted ? (
                   <CheckCircle2 size={20} className="text-white" />
                 ) : isCurrent ? (
                   <CircleDot size={20} className="text-white" />
                 ) : (
-                  <span className="text-sm font-bold text-white/30">{i + 1}</span>
+                  <span className="text-sm font-bold text-gray-400">{i + 1}</span>
                 )}
               </div>
 
               {/* Label */}
               <div className={`mt-3 text-sm font-bold ${
-                isCompleted ? 'text-emerald-400' : isCurrent ? 'text-amber-400' : 'text-white/30'
+                isCompleted ? 'text-emerald-600' : isCurrent ? 'text-orange-500' : 'text-gray-400'
               }`}>
                 {lang === 'hi' ? step.labelHi : step.label}
               </div>
 
               {/* Description */}
-              <div className="mt-1 text-[10px] text-white/40 max-w-[120px] leading-tight">
+              <div className="mt-1 text-[10px] text-gray-500 max-w-[120px] leading-tight">
                 {lang === 'hi' ? step.descriptionHi : step.description}
               </div>
 
               {/* Dates */}
               <div className="mt-3 space-y-1">
-                <div className="text-[10px] text-white/30">
-                  {t.expected}: <span className="text-white/50 font-mono">{step.expectedDate}</span>
+                <div className="text-[10px] text-gray-400">
+                  {t.expected}: <span className="text-gray-600 font-mono">{step.expectedDate}</span>
                 </div>
                 {step.actualDate && (
-                  <div className="text-[10px] text-white/30">
-                    {t.actual}: <span className="text-emerald-400/80 font-mono">{step.actualDate}</span>
+                  <div className="text-[10px] text-gray-400">
+                    {t.actual}: <span className="text-emerald-600 font-mono">{step.actualDate}</span>
                   </div>
                 )}
               </div>
@@ -191,10 +191,10 @@ function AcquisitionStepper({ lang }) {
                 <motion.div
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
-                  className="mt-2 flex items-center gap-1 px-2 py-0.5 rounded-full bg-red-500/15 border border-red-500/30"
+                  className="mt-2 flex items-center gap-1 px-2 py-0.5 rounded-full bg-red-100 border border-red-200"
                 >
-                  <AlertTriangle size={10} className="text-red-400" />
-                  <span className="text-[10px] font-bold text-red-400">
+                  <AlertTriangle size={10} className="text-red-500" />
+                  <span className="text-[10px] font-bold text-red-600">
                     {t.delayed} {step.delayDays} {t.days}
                   </span>
                 </motion.div>
@@ -218,42 +218,40 @@ function AcquisitionStepper({ lang }) {
               transition={{ delay: i * 0.1 }}
               className="flex gap-4"
             >
-              {/* Vertical line + dot */}
               <div className="flex flex-col items-center">
                 <div className={`w-8 h-8 rounded-full flex items-center justify-center border-2 flex-shrink-0 ${
                   isCompleted
                     ? 'bg-emerald-500 border-emerald-400'
                     : isCurrent
                       ? 'bg-amber-500 border-amber-400 animate-pulse'
-                      : 'bg-white/5 border-white/20'
+                      : 'bg-gray-100 border-gray-300'
                 }`}>
                   {isCompleted ? <CheckCircle2 size={14} className="text-white" /> :
                    isCurrent ? <CircleDot size={14} className="text-white" /> :
-                   <span className="text-xs font-bold text-white/30">{i + 1}</span>}
+                   <span className="text-xs font-bold text-gray-400">{i + 1}</span>}
                 </div>
                 {i < acquisitionSteps.length - 1 && (
-                  <div className={`w-0.5 flex-1 mt-1 ${isCompleted ? 'bg-emerald-500' : 'bg-white/10'}`} />
+                  <div className={`w-0.5 flex-1 mt-1 ${isCompleted ? 'bg-emerald-500' : 'bg-gray-200'}`} />
                 )}
               </div>
 
-              {/* Content */}
               <div className="pb-4 flex-1">
                 <div className={`font-bold text-sm ${
-                  isCompleted ? 'text-emerald-400' : isCurrent ? 'text-amber-400' : 'text-white/30'
+                  isCompleted ? 'text-emerald-600' : isCurrent ? 'text-orange-500' : 'text-gray-400'
                 }`}>
                   {lang === 'hi' ? step.labelHi : step.label}
                 </div>
-                <div className="text-[11px] text-white/40 mt-0.5">
+                <div className="text-[11px] text-gray-500 mt-0.5">
                   {lang === 'hi' ? step.descriptionHi : step.description}
                 </div>
-                <div className="flex flex-wrap gap-3 mt-2 text-[10px] text-white/30">
-                  <span>{t.expected}: <span className="font-mono text-white/50">{step.expectedDate}</span></span>
-                  {step.actualDate && <span>{t.actual}: <span className="font-mono text-emerald-400/80">{step.actualDate}</span></span>}
+                <div className="flex flex-wrap gap-3 mt-2 text-[10px] text-gray-400">
+                  <span>{t.expected}: <span className="font-mono text-gray-600">{step.expectedDate}</span></span>
+                  {step.actualDate && <span>{t.actual}: <span className="font-mono text-emerald-600">{step.actualDate}</span></span>}
                 </div>
                 {step.delayDays > 0 && (
-                  <div className="mt-1.5 inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-red-500/15 border border-red-500/30">
-                    <AlertTriangle size={10} className="text-red-400" />
-                    <span className="text-[10px] font-bold text-red-400">{t.delayed} {step.delayDays} {t.days}</span>
+                  <div className="mt-1.5 inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-red-100 border border-red-200">
+                    <AlertTriangle size={10} className="text-red-500" />
+                    <span className="text-[10px] font-bold text-red-600">{t.delayed} {step.delayDays} {t.days}</span>
                   </div>
                 )}
               </div>
@@ -295,10 +293,10 @@ export default function FarmerDashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0D1F0A] relative overflow-hidden">
-      {/* Background ambient tricolor glow */}
-      <div className="absolute top-0 right-1/4 w-96 h-96 bg-[#FF9933]/10 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute bottom-1/3 left-10 w-96 h-96 bg-[#138808]/10 rounded-full blur-3xl pointer-events-none" />
+    <div className="min-h-screen bg-[#FFF8F0] relative overflow-hidden text-[#1a1a2e]">
+      {/* Background ambient glows */}
+      <div className="absolute top-0 right-1/4 w-96 h-96 bg-orange-200/20 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute bottom-1/3 left-10 w-96 h-96 bg-green-200/20 rounded-full blur-3xl pointer-events-none" />
 
       {/* Tiranga accent — top */}
       <div className="h-1.5 tiranga-bar" />
@@ -308,8 +306,8 @@ export default function FarmerDashboard() {
         initial={{ y: -60, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.5 }}
-        className="sticky top-0 z-50 border-b border-white/10"
-        style={{ background: 'rgba(13,31,10,0.92)', backdropFilter: 'blur(20px)' }}
+        className="sticky top-0 z-50 border-b border-orange-100 shadow-sm"
+        style={{ background: 'rgba(255,248,240,0.96)', backdropFilter: 'blur(20px)' }}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-2">
           {/* Left — Logo + Farmer info */}
@@ -318,18 +316,18 @@ export default function FarmerDashboard() {
               <motion.div
                 whileHover={{ rotate: 360 }}
                 transition={{ duration: 0.6 }}
-                className="w-9 h-9 rounded-lg flex items-center justify-center shadow-lg"
+                className="w-9 h-9 rounded-lg flex items-center justify-center shadow-md"
                 style={{ background: 'linear-gradient(135deg, #FF9933, #FFFFFF, #138808)' }}
               >
                 <span className="text-gray-800 font-black text-xs">🇮🇳</span>
               </motion.div>
               <div>
-                <div className="text-white font-black text-sm leading-tight">NLAMS</div>
-                <div className="text-[8px] text-[#86efac] font-bold tracking-widest uppercase">Govt. of India</div>
+                <div className="text-[#003580] font-black text-sm leading-tight">NLAMS</div>
+                <div className="text-[8px] text-[#138808] font-bold tracking-widest uppercase">Govt. of India</div>
               </div>
             </Link>
 
-            <div className="hidden xl:block h-7 w-px bg-white/10 mx-1" />
+            <div className="hidden xl:block h-7 w-px bg-gray-300 mx-1" />
 
             {/* Farmer identity */}
             <div className="hidden sm:flex items-center gap-2">
@@ -338,47 +336,49 @@ export default function FarmerDashboard() {
                 🌾
               </div>
               <div>
-                <div className="text-xs font-bold text-white leading-tight">
+                <div className="text-xs font-bold text-[#1a1a2e] leading-tight">
                   {isHi ? profile.nameHi : profile.name}
                 </div>
-                <div className="text-[10px] text-white/40">
+                <div className="text-[10px] text-gray-500">
                   {isHi ? profile.villageHi : profile.village}, {isHi ? profile.districtHi : profile.district}
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Center — Persona Quick Switcher (Tricolor Themed) */}
-          <div className="flex items-center gap-1 p-1 rounded-xl bg-white/5 border border-white/10 shadow-inner">
+          {/* Center — Persona Quick Switcher */}
+          <div className="flex items-center gap-1 p-1 rounded-xl bg-orange-50 border border-orange-200 shadow-inner">
             <Link
               to="/dashboard"
-              className="px-3 py-1.5 rounded-lg text-xs font-medium text-white/70 hover:text-white hover:bg-white/10 transition-all flex items-center gap-1.5"
+              className="px-3 py-1.5 rounded-lg text-xs font-medium text-gray-600 hover:text-[#FF9933] hover:bg-white transition-all flex items-center gap-1.5"
             >
               <span>🏛️</span>
               <span className="hidden md:inline">National View</span>
             </Link>
             <Link
               to="/state-dashboard"
-              className="px-3 py-1.5 rounded-lg text-xs font-medium text-white/70 hover:text-white hover:bg-white/10 transition-all flex items-center gap-1.5"
+              className="px-3 py-1.5 rounded-lg text-xs font-medium text-gray-600 hover:text-[#FF9933] hover:bg-white transition-all flex items-center gap-1.5"
             >
               <span>🗳️</span>
               <span className="hidden md:inline">State (MH)</span>
             </Link>
             <Link
               to="/district-dashboard"
-              className="px-3 py-1.5 rounded-lg text-xs font-medium text-white/70 hover:text-white hover:bg-white/10 transition-all flex items-center gap-1.5"
+              className="px-3 py-1.5 rounded-lg text-xs font-medium text-gray-600 hover:text-[#FF9933] hover:bg-white transition-all flex items-center gap-1.5"
             >
               <span>📋</span>
               <span className="hidden md:inline">District (Pune)</span>
             </Link>
-            <span className="px-3 py-1.5 rounded-lg text-xs font-bold text-white shadow-md flex items-center gap-1.5"
-              style={{ background: 'linear-gradient(135deg, #FF9933, #E07800)' }}>
+            <span
+              className="px-3 py-1.5 rounded-lg text-xs font-bold text-white shadow-md flex items-center gap-1.5"
+              style={{ background: 'linear-gradient(135deg, #FF9933, #E07800)' }}
+            >
               <span>🌾</span>
               <span className="hidden md:inline">Farmer Portal</span>
             </span>
             <Link
               to="/"
-              className="px-2.5 py-1.5 rounded-lg text-xs font-medium text-white/50 hover:text-white hover:bg-white/10 transition-all flex items-center gap-1"
+              className="px-2.5 py-1.5 rounded-lg text-xs font-medium text-gray-500 hover:text-[#FF9933] hover:bg-white transition-all flex items-center gap-1"
               title="Return to Public Home"
             >
               <span>🏠</span>
@@ -392,21 +392,20 @@ export default function FarmerDashboard() {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={() => setLang(lang === 'en' ? 'hi' : 'en')}
-              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-xs font-bold border border-white/15 hover:border-amber-400/40 hover:bg-amber-500/10 transition-all"
+              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-xs font-bold border border-gray-300 hover:border-orange-400 hover:bg-orange-50 transition-all shadow-sm"
             >
               <Languages size={13} className="text-[#FF9933]" />
-              <span className="text-white/80">{lang === 'en' ? 'हिंदी' : 'English'}</span>
+              <span className="text-gray-700">{lang === 'en' ? 'हिंदी' : 'English'}</span>
             </motion.button>
 
             {/* Bell */}
             <motion.button
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.9 }}
-              className="relative p-2 rounded-xl text-white/60 hover:text-white hover:bg-white/10 transition-all"
+              className="relative p-2 rounded-xl text-gray-500 hover:text-[#FF9933] hover:bg-orange-50 transition-all"
             >
               <Bell size={16} />
-              <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full animate-pulse"
-                style={{ background: '#FF9933' }} />
+              <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full animate-pulse bg-[#FF9933]" />
             </motion.button>
 
             {/* Logout */}
@@ -414,7 +413,7 @@ export default function FarmerDashboard() {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={() => navigate('/auth')}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold text-white/60 hover:text-white border border-white/10 hover:border-red-500/40 hover:bg-red-500/10 transition-all"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold text-gray-500 border border-gray-200 hover:border-red-300 hover:text-red-500 hover:bg-red-50 transition-all"
             >
               <LogOut size={13} />
               <span className="hidden sm:inline">{t.logout}</span>
@@ -428,10 +427,10 @@ export default function FarmerDashboard() {
 
         {/* ─── My Land Card + Mini Map ────────────────────────────── */}
         <FadeIn delay={0}>
-          <div className="glass rounded-2xl overflow-hidden">
-            <div className="p-5 border-b border-white/5 flex items-center justify-between">
-              <h2 className="text-lg font-black text-white flex items-center gap-2">
-                <Sprout size={20} className="text-emerald-400" />
+          <div className="bg-white rounded-2xl overflow-hidden shadow-md border border-gray-100">
+            <div className="p-5 border-b border-gray-100 bg-gray-50 flex items-center justify-between">
+              <h2 className="text-lg font-black text-[#1a1a2e] flex items-center gap-2">
+                <Sprout size={20} className="text-emerald-600" />
                 {t.myLand}
               </h2>
               <AcquisitionBadge status={parcel.acquisitionStatus} />
@@ -444,7 +443,7 @@ export default function FarmerDashboard() {
               </div>
 
               {/* Land Details */}
-              <div className="lg:col-span-3 p-5 lg:border-l border-white/5">
+              <div className="lg:col-span-3 p-5 lg:border-l border-gray-100">
                 <div className="grid grid-cols-2 gap-x-8 gap-y-4">
                   <DetailRow label={t.plotNumber} value={parcel.plotNumber} mono />
                   <DetailRow label={t.surveyNo} value={parcel.surveyNumber} mono />
@@ -457,17 +456,17 @@ export default function FarmerDashboard() {
                 </div>
 
                 {/* Acquiring Project */}
-                <div className="mt-6 p-4 rounded-xl bg-white/[0.03] border border-white/5">
-                  <div className="text-[10px] uppercase tracking-widest text-white/30 font-bold mb-2">{t.project}</div>
-                  <div className="text-white font-bold text-sm mb-1">
+                <div className="mt-6 p-4 rounded-xl bg-orange-50/60 border border-orange-100">
+                  <div className="text-[10px] uppercase tracking-widest text-orange-600 font-bold mb-2">{t.project}</div>
+                  <div className="text-[#1a1a2e] font-bold text-sm mb-1">
                     {isHi ? parcel.projectNameHi : parcel.projectName}
                   </div>
-                  <div className="flex flex-wrap gap-3 text-xs text-white/40">
+                  <div className="flex flex-wrap gap-3 text-xs text-gray-500">
                     <span className="flex items-center gap-1">
-                      <Landmark size={11} /> {t.purpose}: <span className="text-white/60">{isHi ? parcel.projectPurposeHi : parcel.projectPurpose}</span>
+                      <Landmark size={11} className="text-orange-500" /> {t.purpose}: <span className="text-gray-700 font-medium">{isHi ? parcel.projectPurposeHi : parcel.projectPurpose}</span>
                     </span>
                     <span className="flex items-center gap-1">
-                      <Shield size={11} /> {t.acquiringBody}: <span className="text-white/60">{isHi ? parcel.acquiringBodyHi : parcel.acquiringBody}</span>
+                      <Shield size={11} className="text-emerald-600" /> {t.acquiringBody}: <span className="text-gray-700 font-medium">{isHi ? parcel.acquiringBodyHi : parcel.acquiringBody}</span>
                     </span>
                   </div>
                 </div>
@@ -478,9 +477,9 @@ export default function FarmerDashboard() {
 
         {/* ─── Acquisition Status Stepper ─────────────────────────── */}
         <FadeIn delay={0.1}>
-          <div className="glass rounded-2xl p-6 sm:p-8">
-            <h2 className="text-lg font-black text-white flex items-center gap-2 mb-8">
-              <Scale size={20} className="text-amber-400" />
+          <div className="bg-white rounded-2xl p-6 sm:p-8 shadow-md border border-gray-100">
+            <h2 className="text-lg font-black text-[#1a1a2e] flex items-center gap-2 mb-8">
+              <Scale size={20} className="text-orange-500" />
               {t.stepper}
             </h2>
             <AcquisitionStepper lang={lang} />
@@ -491,37 +490,37 @@ export default function FarmerDashboard() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Compensation Card */}
           <FadeIn delay={0.15}>
-            <div className="glass rounded-2xl h-full">
-              <div className="p-5 border-b border-white/5">
-                <h2 className="text-lg font-black text-white flex items-center gap-2">
-                  <IndianRupee size={20} className="text-amber-400" />
+            <div className="bg-white rounded-2xl h-full shadow-md border border-gray-100">
+              <div className="p-5 border-b border-gray-100 bg-gray-50">
+                <h2 className="text-lg font-black text-[#1a1a2e] flex items-center gap-2">
+                  <IndianRupee size={20} className="text-orange-500" />
                   {t.compensation}
                 </h2>
               </div>
               <div className="p-5 space-y-5">
                 {/* Amounts */}
                 <div className="grid grid-cols-3 gap-3">
-                  <div className="text-center p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20">
-                    <div className="text-[10px] text-emerald-400/60 font-bold uppercase mb-1">{t.totalSanctioned}</div>
-                    <div className="text-lg font-black text-emerald-400">{formatINR(comp.totalSanctioned)}</div>
+                  <div className="text-center p-3 rounded-xl bg-emerald-50 border border-emerald-200">
+                    <div className="text-[10px] text-emerald-700 font-bold uppercase mb-1">{t.totalSanctioned}</div>
+                    <div className="text-lg font-black text-emerald-700">{formatINR(comp.totalSanctioned)}</div>
                   </div>
-                  <div className="text-center p-3 rounded-xl bg-blue-500/10 border border-blue-500/20">
-                    <div className="text-[10px] text-blue-400/60 font-bold uppercase mb-1">{t.amountPaid}</div>
-                    <div className="text-lg font-black text-blue-400">{formatINR(comp.amountPaid)}</div>
+                  <div className="text-center p-3 rounded-xl bg-blue-50 border border-blue-200">
+                    <div className="text-[10px] text-blue-700 font-bold uppercase mb-1">{t.amountPaid}</div>
+                    <div className="text-lg font-black text-blue-700">{formatINR(comp.amountPaid)}</div>
                   </div>
-                  <div className="text-center p-3 rounded-xl bg-amber-500/10 border border-amber-500/20">
-                    <div className="text-[10px] text-amber-400/60 font-bold uppercase mb-1">{t.amountPending}</div>
-                    <div className="text-lg font-black text-amber-400">{formatINR(comp.amountPending)}</div>
+                  <div className="text-center p-3 rounded-xl bg-orange-50 border border-orange-200">
+                    <div className="text-[10px] text-orange-700 font-bold uppercase mb-1">{t.amountPending}</div>
+                    <div className="text-lg font-black text-orange-600">{formatINR(comp.amountPending)}</div>
                   </div>
                 </div>
 
                 {/* Progress bar */}
                 <div>
                   <div className="flex justify-between mb-2 text-xs">
-                    <span className="text-white/40">{t.amountPaid}</span>
-                    <span className="text-white font-bold">{paidPercent}%</span>
+                    <span className="text-gray-500">{t.amountPaid}</span>
+                    <span className="text-[#1a1a2e] font-bold">{paidPercent}%</span>
                   </div>
-                  <div className="h-3 rounded-full bg-white/5 overflow-hidden">
+                  <div className="h-3 rounded-full bg-gray-100 overflow-hidden">
                     <motion.div
                       initial={{ width: 0 }}
                       animate={{ width: `${paidPercent}%` }}
@@ -533,42 +532,42 @@ export default function FarmerDashboard() {
 
                 {/* Details */}
                 <div className="grid grid-cols-2 gap-3 text-xs">
-                  <div className="flex items-center gap-2 text-white/40">
-                    <CreditCard size={13} className="text-white/20" />
-                    {t.paymentMode}: <span className="text-white/70">{isHi ? comp.paymentModeHi : comp.paymentMode}</span>
+                  <div className="flex items-center gap-2 text-gray-500">
+                    <CreditCard size={13} className="text-gray-400" />
+                    {t.paymentMode}: <span className="text-gray-800 font-medium">{isHi ? comp.paymentModeHi : comp.paymentMode}</span>
                   </div>
-                  <div className="flex items-center gap-2 text-white/40">
-                    <Calendar size={13} className="text-white/20" />
-                    {t.expectedPayment}: <span className="text-white/70 font-mono">{comp.expectedPaymentDate}</span>
+                  <div className="flex items-center gap-2 text-gray-500">
+                    <Calendar size={13} className="text-gray-400" />
+                    {t.expectedPayment}: <span className="text-gray-800 font-mono font-medium">{comp.expectedPaymentDate}</span>
                   </div>
-                  <div className="flex items-center gap-2 text-white/40">
-                    <Landmark size={13} className="text-white/20" />
+                  <div className="flex items-center gap-2 text-gray-500">
+                    <Landmark size={13} className="text-gray-400" />
                     {comp.bankName} (****{comp.bankAccountLast4})
                   </div>
-                  <div className="flex items-center gap-2 text-white/40">
+                  <div className="flex items-center gap-2 text-gray-500">
                     {t.bankLinked}: <StatusBadge value={comp.bankLinked ? 'Yes' : 'No'} lang={lang} />
                   </div>
                 </div>
 
                 {/* Payment history */}
                 <div>
-                  <div className="text-xs font-bold text-white/30 uppercase tracking-widest mb-3">{t.paymentHistory}</div>
+                  <div className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3">{t.paymentHistory}</div>
                   <div className="space-y-2">
                     {comp.payments.map((p, i) => (
-                      <div key={i} className="flex items-center justify-between p-2.5 rounded-lg bg-white/[0.02] hover:bg-white/[0.04] transition-colors">
+                      <div key={i} className="flex items-center justify-between p-2.5 rounded-lg bg-gray-50 hover:bg-orange-50/50 transition-colors border border-gray-100">
                         <div className="flex items-center gap-3">
                           <div className={`w-7 h-7 rounded-lg flex items-center justify-center ${
-                            p.status === 'Paid' ? 'bg-emerald-500/15' : 'bg-amber-500/15'
+                            p.status === 'Paid' ? 'bg-emerald-100' : 'bg-orange-100'
                           }`}>
-                            {p.status === 'Paid' ? <CheckCircle2 size={13} className="text-emerald-400" /> : <Clock size={13} className="text-amber-400" />}
+                            {p.status === 'Paid' ? <CheckCircle2 size={13} className="text-emerald-600" /> : <Clock size={13} className="text-orange-500" />}
                           </div>
                           <div>
-                            <div className="text-xs font-semibold text-white/80">{isHi ? p.typeHi : p.type}</div>
-                            <div className="text-[10px] text-white/30 font-mono">{p.date}</div>
+                            <div className="text-xs font-semibold text-gray-800">{isHi ? p.typeHi : p.type}</div>
+                            <div className="text-[10px] text-gray-400 font-mono">{p.date}</div>
                           </div>
                         </div>
                         <div className="flex items-center gap-3">
-                          <span className="text-sm font-bold text-white/90 font-mono">{formatINR(p.amount)}</span>
+                          <span className="text-sm font-bold text-gray-800 font-mono">{formatINR(p.amount)}</span>
                           <StatusBadge value={p.status} lang={lang} />
                         </div>
                       </div>
@@ -581,10 +580,10 @@ export default function FarmerDashboard() {
 
           {/* R&R Status Card */}
           <FadeIn delay={0.2}>
-            <div className="glass rounded-2xl h-full">
-              <div className="p-5 border-b border-white/5">
-                <h2 className="text-lg font-black text-white flex items-center gap-2">
-                  <Home size={20} className="text-cyan-400" />
+            <div className="bg-white rounded-2xl h-full shadow-md border border-gray-100">
+              <div className="p-5 border-b border-gray-100 bg-gray-50">
+                <h2 className="text-lg font-black text-[#1a1a2e] flex items-center gap-2">
+                  <Home size={20} className="text-sky-600" />
                   {t.rrTitle}
                 </h2>
               </div>
@@ -592,18 +591,18 @@ export default function FarmerDashboard() {
                 {/* Eligibility highlight */}
                 <div className={`p-4 rounded-xl border ${
                   rrStatus.eligible
-                    ? 'bg-emerald-500/10 border-emerald-500/20'
-                    : 'bg-red-500/10 border-red-500/20'
+                    ? 'bg-emerald-50 border-emerald-200'
+                    : 'bg-red-50 border-red-200'
                 }`}>
                   <div className="flex items-center gap-3">
                     <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${
-                      rrStatus.eligible ? 'bg-emerald-500/20' : 'bg-red-500/20'
+                      rrStatus.eligible ? 'bg-emerald-100' : 'bg-red-100'
                     }`}>
-                      {rrStatus.eligible ? <BadgeCheck size={20} className="text-emerald-400" /> : <XCircle size={20} className="text-red-400" />}
+                      {rrStatus.eligible ? <BadgeCheck size={20} className="text-emerald-600" /> : <XCircle size={20} className="text-red-500" />}
                     </div>
                     <div>
-                      <div className="text-xs text-white/40">{t.rrEligible}</div>
-                      <div className={`text-lg font-black ${rrStatus.eligible ? 'text-emerald-400' : 'text-red-400'}`}>
+                      <div className="text-xs text-gray-500">{t.rrEligible}</div>
+                      <div className={`text-lg font-black ${rrStatus.eligible ? 'text-emerald-700' : 'text-red-600'}`}>
                         {rrStatus.eligible ? t.yes : t.no}
                       </div>
                     </div>
@@ -620,13 +619,13 @@ export default function FarmerDashboard() {
 
                 {/* Annuity */}
                 {rrStatus.annuity === 'Yes' && (
-                  <div className="p-4 rounded-xl bg-gradient-to-r from-amber-500/10 to-orange-500/10 border border-amber-500/20">
+                  <div className="p-4 rounded-xl bg-orange-50/70 border border-orange-200">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-3">
-                        <IndianRupee size={18} className="text-amber-400" />
+                        <IndianRupee size={18} className="text-orange-500" />
                         <div>
-                          <div className="text-xs text-white/40">{t.annuity}</div>
-                          <div className="text-lg font-black text-amber-400">{formatINR(rrStatus.annuityAmount)}<span className="text-xs text-white/30 font-normal"> / year</span></div>
+                          <div className="text-xs text-gray-500">{t.annuity}</div>
+                          <div className="text-lg font-black text-orange-600">{formatINR(rrStatus.annuityAmount)}<span className="text-xs text-gray-500 font-normal"> / year</span></div>
                         </div>
                       </div>
                       <StatusBadge value="Yes" lang={lang} />
@@ -640,35 +639,35 @@ export default function FarmerDashboard() {
 
         {/* ─── My Documents ───────────────────────────────────────── */}
         <FadeIn delay={0.25}>
-          <div className="glass rounded-2xl overflow-hidden">
-            <div className="p-5 border-b border-white/5">
-              <h2 className="text-lg font-black text-white flex items-center gap-2">
-                <FileText size={20} className="text-purple-400" />
+          <div className="bg-white rounded-2xl overflow-hidden shadow-md border border-gray-100">
+            <div className="p-5 border-b border-gray-100 bg-gray-50">
+              <h2 className="text-lg font-black text-[#1a1a2e] flex items-center gap-2">
+                <FileText size={20} className="text-purple-600" />
                 {t.documents}
               </h2>
             </div>
-            <div className="divide-y divide-white/5">
+            <div className="divide-y divide-gray-100">
               {documents.map((doc, i) => (
                 <motion.div
                   key={doc.id}
                   initial={{ opacity: 0, x: -10 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 0.3 + i * 0.06 }}
-                  className="flex items-center justify-between px-5 py-4 hover:bg-white/[0.02] transition-colors"
+                  className="flex items-center justify-between px-5 py-4 hover:bg-orange-50/40 transition-colors"
                 >
                   <div className="flex items-center gap-4">
                     <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${
-                      doc.available ? 'bg-purple-500/15' : 'bg-white/5'
+                      doc.available ? 'bg-purple-100' : 'bg-gray-100'
                     }`}>
-                      <FileText size={18} className={doc.available ? 'text-purple-400' : 'text-white/20'} />
+                      <FileText size={18} className={doc.available ? 'text-purple-600' : 'text-gray-400'} />
                     </div>
                     <div>
-                      <div className={`text-sm font-semibold ${doc.available ? 'text-white/90' : 'text-white/30'}`}>
+                      <div className={`text-sm font-semibold ${doc.available ? 'text-gray-800' : 'text-gray-400'}`}>
                         {isHi ? doc.nameHi : doc.name}
                       </div>
-                      <div className="flex items-center gap-3 mt-0.5 text-[10px] text-white/30">
+                      <div className="flex items-center gap-3 mt-0.5 text-[10px] text-gray-400">
                         {doc.dateIssued && (
-                          <span>{t.dateIssued}: <span className="font-mono">{doc.dateIssued}</span></span>
+                          <span>{t.dateIssued}: <span className="font-mono text-gray-600">{doc.dateIssued}</span></span>
                         )}
                         {doc.fileSize && <span>{doc.fileSize}</span>}
                       </div>
@@ -679,13 +678,13 @@ export default function FarmerDashboard() {
                     <motion.button
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
-                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-purple-400 bg-purple-500/10 border border-purple-500/20 hover:bg-purple-500/20 transition-all"
+                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-purple-700 bg-purple-100 border border-purple-200 hover:bg-purple-200 transition-all"
                     >
                       <Download size={13} />
                       {t.download}
                     </motion.button>
                   ) : (
-                    <span className="text-[10px] text-white/20 italic">{t.notAvailable}</span>
+                    <span className="text-[10px] text-gray-400 italic">{t.notAvailable}</span>
                   )}
                 </motion.div>
               ))}
@@ -695,38 +694,38 @@ export default function FarmerDashboard() {
 
         {/* ─── Grievance Section ───────────────────────────────────── */}
         <FadeIn delay={0.3}>
-          <div className="glass rounded-2xl overflow-hidden">
-            <div className="p-5 border-b border-white/5">
-              <h2 className="text-lg font-black text-white flex items-center gap-2">
-                <MessageSquarePlus size={20} className="text-red-400" />
+          <div className="bg-white rounded-2xl overflow-hidden shadow-md border border-gray-100">
+            <div className="p-5 border-b border-gray-100 bg-gray-50">
+              <h2 className="text-lg font-black text-[#1a1a2e] flex items-center gap-2">
+                <MessageSquarePlus size={20} className="text-red-500" />
                 {t.grievance}
               </h2>
-              <p className="text-xs text-white/40 mt-1">{t.grievanceDesc}</p>
+              <p className="text-xs text-gray-500 mt-1">{t.grievanceDesc}</p>
             </div>
 
             <div className="p-5 space-y-5">
               {/* Past Complaints */}
               {grievances.length > 0 && (
                 <div>
-                  <div className="text-xs font-bold text-white/30 uppercase tracking-widest mb-3">{t.pastComplaints}</div>
+                  <div className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3">{t.pastComplaints}</div>
                   {grievances.map((g) => (
-                    <div key={g.id} className="p-4 rounded-xl bg-white/[0.02] border border-white/5 space-y-3">
+                    <div key={g.id} className="p-4 rounded-xl bg-gray-50 border border-gray-200 space-y-3 mb-3 shadow-sm">
                       <div className="flex flex-wrap items-start justify-between gap-2">
                         <div>
-                          <div className="text-xs text-white/30">{t.complaintId}: <span className="font-mono text-white/60">{g.id}</span></div>
-                          <div className="text-sm font-bold text-white/90 mt-1">{isHi ? g.typeHi : g.type}</div>
+                          <div className="text-xs text-gray-400">{t.complaintId}: <span className="font-mono text-gray-600">{g.id}</span></div>
+                          <div className="text-sm font-bold text-gray-900 mt-1">{isHi ? g.typeHi : g.type}</div>
                         </div>
-                        <span className="px-3 py-1 rounded-full text-[10px] font-bold bg-amber-500/15 text-amber-400 border border-amber-500/30">
+                        <span className="px-3 py-1 rounded-full text-[10px] font-bold bg-amber-100 text-amber-700 border border-amber-200">
                           {isHi ? g.statusHi : g.status}
                         </span>
                       </div>
-                      <p className="text-xs text-white/50 leading-relaxed">{isHi ? g.descriptionHi : g.description}</p>
-                      <div className="flex flex-wrap gap-4 text-[10px] text-white/30">
-                        <span>{t.submittedOn}: <span className="font-mono">{g.submittedOn}</span></span>
-                        <span>{t.lastUpdate}: <span className="font-mono">{g.lastUpdate}</span></span>
+                      <p className="text-xs text-gray-600 leading-relaxed">{isHi ? g.descriptionHi : g.description}</p>
+                      <div className="flex flex-wrap gap-4 text-[10px] text-gray-400">
+                        <span>{t.submittedOn}: <span className="font-mono text-gray-600">{g.submittedOn}</span></span>
+                        <span>{t.lastUpdate}: <span className="font-mono text-gray-600">{g.lastUpdate}</span></span>
                       </div>
                       {g.responseNote && (
-                        <div className="p-3 rounded-lg bg-emerald-500/5 border border-emerald-500/10 text-xs text-emerald-400/70 leading-relaxed">
+                        <div className="p-3 rounded-lg bg-emerald-50 border border-emerald-200 text-xs text-emerald-800 leading-relaxed font-medium">
                           💬 {isHi ? g.responseNoteHi : g.responseNote}
                         </div>
                       )}
@@ -743,7 +742,7 @@ export default function FarmerDashboard() {
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                     onClick={() => setShowGrievanceForm(true)}
-                    className="w-full py-4 rounded-xl text-sm font-bold text-white bg-gradient-to-r from-red-500 to-red-600 hover:from-red-400 hover:to-red-500 shadow-lg shadow-red-500/20 transition-all flex items-center justify-center gap-2"
+                    className="w-full py-4 rounded-xl text-sm font-bold text-white bg-gradient-to-r from-red-500 to-red-600 hover:from-red-400 hover:to-red-500 shadow-md shadow-red-200 transition-all flex items-center justify-center gap-2"
                   >
                     <MessageSquarePlus size={18} />
                     {t.grievance}
@@ -755,7 +754,7 @@ export default function FarmerDashboard() {
                     animate={{ opacity: 1, height: 'auto' }}
                     exit={{ opacity: 0, height: 0 }}
                     onSubmit={handleSubmitGrievance}
-                    className="space-y-4 p-4 rounded-xl border border-red-500/20 bg-red-500/5 overflow-hidden"
+                    className="space-y-4 p-4 rounded-xl border border-red-200 bg-red-50/50 overflow-hidden"
                   >
                     {submitted ? (
                       <motion.div
@@ -763,11 +762,11 @@ export default function FarmerDashboard() {
                         animate={{ scale: 1 }}
                         className="text-center py-6"
                       >
-                        <CheckCircle2 size={40} className="text-emerald-400 mx-auto mb-3" />
-                        <div className="text-lg font-bold text-emerald-400">
+                        <CheckCircle2 size={40} className="text-emerald-500 mx-auto mb-3" />
+                        <div className="text-lg font-bold text-emerald-700">
                           {lang === 'en' ? 'Complaint Submitted!' : 'शिकायत दर्ज हो गई!'}
                         </div>
-                        <div className="text-xs text-white/40 mt-1">
+                        <div className="text-xs text-gray-500 mt-1">
                           {lang === 'en' ? 'You will be notified about updates.' : 'आपको अपडेट की सूचना दी जाएगी।'}
                         </div>
                       </motion.div>
@@ -777,11 +776,11 @@ export default function FarmerDashboard() {
                           value={grievanceType}
                           onChange={e => setGrievanceType(e.target.value)}
                           required
-                          className="w-full px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-sm text-white focus:outline-none focus:border-red-500/40 transition-all appearance-none cursor-pointer"
+                          className="w-full px-4 py-2.5 rounded-xl bg-white border border-gray-200 text-sm text-[#1a1a2e] focus:outline-none focus:border-red-400 focus:ring-2 focus:ring-red-100 transition-all appearance-none cursor-pointer"
                         >
-                          <option value="" disabled className="bg-[#0a0f1e]">{t.selectIssue}</option>
+                          <option value="" disabled className="bg-white">{t.selectIssue}</option>
                           {grievanceTypes.map(gt => (
-                            <option key={gt.value} value={gt.value} className="bg-[#0a0f1e]">
+                            <option key={gt.value} value={gt.value} className="bg-white">
                               {isHi ? gt.labelHi : gt.label}
                             </option>
                           ))}
@@ -793,7 +792,7 @@ export default function FarmerDashboard() {
                           required
                           placeholder={t.describeIssue}
                           rows={3}
-                          className="w-full px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-sm text-white placeholder-white/30 focus:outline-none focus:border-red-500/40 transition-all resize-none"
+                          className="w-full px-4 py-2.5 rounded-xl bg-white border border-gray-200 text-sm text-[#1a1a2e] placeholder-gray-400 focus:outline-none focus:border-red-400 focus:ring-2 focus:ring-red-100 transition-all resize-none"
                         />
 
                         <div className="flex gap-3">
@@ -801,7 +800,7 @@ export default function FarmerDashboard() {
                             type="submit"
                             whileHover={{ scale: 1.02 }}
                             whileTap={{ scale: 0.98 }}
-                            className="flex-1 py-2.5 rounded-xl text-sm font-bold text-white bg-gradient-to-r from-red-500 to-red-600 flex items-center justify-center gap-2"
+                            className="flex-1 py-2.5 rounded-xl text-sm font-bold text-white bg-gradient-to-r from-red-500 to-red-600 flex items-center justify-center gap-2 shadow-md shadow-red-200"
                           >
                             <Send size={14} />
                             {t.submitComplaint}
@@ -809,7 +808,7 @@ export default function FarmerDashboard() {
                           <button
                             type="button"
                             onClick={() => setShowGrievanceForm(false)}
-                            className="px-4 py-2.5 rounded-xl text-sm text-white/50 border border-white/10 hover:bg-white/5 transition-all"
+                            className="px-4 py-2.5 rounded-xl text-sm text-gray-600 border border-gray-200 hover:bg-gray-100 transition-all"
                           >
                             ✕
                           </button>
@@ -827,7 +826,7 @@ export default function FarmerDashboard() {
 
       {/* Leaflet styles */}
       <style>{`
-        .leaflet-container { background: #0a0f1e !important; }
+        .leaflet-container { background: #f8fafc !important; }
         .leaflet-control-attribution { display: none !important; }
       `}</style>
 
@@ -851,27 +850,27 @@ export default function FarmerDashboard() {
 function DetailRow({ label, value, mono }) {
   return (
     <div>
-      <div className="text-[10px] uppercase tracking-widest text-white/30 font-bold mb-0.5">{label}</div>
-      <div className={`text-sm text-white/80 font-semibold ${mono ? 'font-mono' : ''}`}>{value}</div>
+      <div className="text-[10px] uppercase tracking-widest text-gray-400 font-bold mb-0.5">{label}</div>
+      <div className={`text-sm text-gray-800 font-semibold ${mono ? 'font-mono' : ''}`}>{value}</div>
     </div>
   );
 }
 
 function RRItem({ icon, label, value, lang, color }) {
   const colorMap = {
-    cyan: 'bg-cyan-500/10 text-cyan-400',
-    blue: 'bg-blue-500/10 text-blue-400',
-    purple: 'bg-purple-500/10 text-purple-400',
-    emerald: 'bg-emerald-500/10 text-emerald-400',
+    cyan: 'bg-cyan-100 text-cyan-700',
+    blue: 'bg-blue-100 text-blue-700',
+    purple: 'bg-purple-100 text-purple-700',
+    emerald: 'bg-emerald-100 text-emerald-700',
   };
 
   return (
-    <div className="flex items-center justify-between p-3 rounded-xl bg-white/[0.02] hover:bg-white/[0.04] transition-colors">
+    <div className="flex items-center justify-between p-3 rounded-xl bg-gray-50 hover:bg-orange-50/50 transition-colors border border-gray-100">
       <div className="flex items-center gap-3">
         <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${colorMap[color]}`}>
           {icon}
         </div>
-        <span className="text-sm text-white/70 font-medium">{label}</span>
+        <span className="text-sm text-gray-700 font-medium">{label}</span>
       </div>
       <StatusBadge value={value} lang={lang} />
     </div>
