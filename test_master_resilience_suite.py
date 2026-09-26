@@ -57,6 +57,12 @@ from execution.portal_navigator_bot import (
     NavigatorChatRequest
 )
 
+# Feature 7
+from execution.voice_query_engine import (
+    process_voice_query,
+    VoiceQueryRequest
+)
+
 if hasattr(sys.stdout, "reconfigure"):
     sys.stdout.reconfigure(encoding="utf-8")
 
@@ -369,10 +375,62 @@ def test_feature_6_edge_cases():
     print("  -> PASSED: Correctly routed Hinglish delay complaint to /farmer-dashboard.")
 
 
+def test_feature_7_edge_cases():
+    print("\n" + "=" * 80)
+    print(">> AUDITING FEATURE 7: DHWANI SAHAYAK (VERNACULAR VOICE AI - 7 LANGUAGES)")
+    print("=" * 80)
+
+    # 7.1 Bengali Spoken Query & English Translation
+    print("[7.1] Bengali Spoken Query Translation & Script Generation...")
+    res_bn = process_voice_query(VoiceQueryRequest(
+        transcript="Amar jomi khatian number 305 er taka kobe pabo?",
+        preferred_dialect="bengali",
+        context_record={"survey_no": "305", "compensation_amount": 1500000.0}
+    ))
+    assert "Bengali" in res_bn.detected_language
+    assert res_bn.extracted_entities.survey_no == "305"
+    assert "305" in res_bn.english_translation
+    assert "নমস্কার" in res_bn.spoken_response_native
+    print(f"  -> PASSED: Bengali query translated to English: '{res_bn.english_translation}'")
+
+    # 7.2 Haryanvi Query & English Translation
+    print("[7.2] Haryanvi Dialect Compensation Query...")
+    res_hr = process_voice_query(VoiceQueryRequest(
+        transcript="Mhara survey number 704 hai, zameen ke rupeye kad aawenge?",
+        preferred_dialect="haryanvi",
+        context_record={"survey_no": "704", "compensation_amount": 1800000.0}
+    ))
+    assert "Haryanvi" in res_hr.detected_language
+    assert res_hr.extracted_entities.survey_no == "704"
+    assert "704" in res_hr.english_translation
+    assert "राम-राम भाई" in res_hr.spoken_response_native
+    print(f"  -> PASSED: Haryanvi query translated to English: '{res_hr.english_translation}'")
+
+    # 7.3 Spoken GIS Map Intent
+    print("[7.3] Spoken GIS Land Map Navigation Action...")
+    res_map = process_voice_query(VoiceQueryRequest(
+        transcript="Humare khasra 104 ka naksha dikhao kahan road nikal rahi hai",
+        preferred_dialect="hi"
+    ))
+    assert res_map.primary_intent == "OPEN_GIS_MAP"
+    assert res_map.autonomous_action.target_route == "/map"
+    print("  -> PASSED: Autonomous voice action routed to /map.")
+
+    # 7.4 Life-Safety Voice Interception (Bhojpuri Distress)
+    print("[7.4] Life Safety Emergency Interception in Regional Dialect...")
+    res_distress = process_voice_query(VoiceQueryRequest(
+        transcript="Humar zameen chhin gail, ab hum pure parivar ke sath aatmhatya kar leb",
+        preferred_dialect="bhojpuri"
+    ))
+    assert res_distress.emergency_escalation is True
+    assert "14416" in res_distress.spoken_response_native or "14416" in res_distress.spoken_response_hi
+    print("  -> PASSED: Emergency suicide protocol intercepted voice distress with Tele-MANAS (14416).")
+
+
 def run_master_suite():
     start_time = time.time()
     print("=" * 80)
-    print("STARTING COMPLETE RESILIENCE AUDIT ON ALL 6 NLAMS AI ENGINE FEATURES")
+    print("STARTING COMPLETE RESILIENCE AUDIT ON ALL 7 NLAMS AI ENGINE FEATURES")
     print(f"Timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
     print("=" * 80)
 
@@ -382,10 +440,11 @@ def run_master_suite():
     test_feature_4_edge_cases()
     test_feature_5_edge_cases()
     test_feature_6_edge_cases()
+    test_feature_7_edge_cases()
 
     elapsed = time.time() - start_time
     print("\n" + "=" * 80)
-    print(f"ALL 6 FEATURES PASSED 100% OF INTENSIVE EDGE-CASE AUDITS! ({elapsed:.2f}s)")
+    print(f"ALL 7 FEATURES PASSED 100% OF INTENSIVE EDGE-CASE AUDITS! ({elapsed:.2f}s)")
     print("SYSTEM STATUS: PRODUCTION-GRADE, SELF-ANNEALED, ZERO REGRESSIONS")
     print("=" * 80)
 

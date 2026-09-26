@@ -47,7 +47,7 @@ NLAMS operates on a 3-layer architecture separating natural language directives,
 
 ---
 
-## ⚡ The 6 Core AI Engine Microservices
+## ⚡ The 7 Core AI Engine Microservices
 
 | # | Microservice | Route | Key Capabilities |
 |---|---|---|---|
@@ -57,6 +57,7 @@ NLAMS operates on a 3-layer architecture separating natural language directives,
 | **4** | **Cadastral Topology Anomaly Detector** | `POST /api/v1/verify-geometry` | Rejects self-intersecting "bowtie" loops without lossy repair. Detects parcel overlaps, micro-slivers ($< 5\text{ m}^2$), and triggers alerts within $100\text{ m}$ of protected forest/sanctuary buffer zones. |
 | **5** | **Bilingual Statutory Award Dossier** | `POST /api/v1/generate-award-summary` | ReportLab PDF engine with Unicode Devanagari Hindi font support. Validates mathematical business rules ($\text{Resettled} \le \text{Affected}$). Inline PDF download at `/api/v1/download-report/{filename}`. |
 | **6** | **AI Sahayak & Web Navigator Bot** | `POST /api/v1/navigator-chat` | Omnipresent floating assistant (`FloatingAIBot.jsx`). Translates user requests into instant deep-link routing cards to `/map`, `/new-proposal`, and `/farmer-dashboard`. |
+| **7** | **Dhwani Sahayak (Voice-to-Action)** | `POST /api/v1/voice-query` | Voice AI for less-educated rural landholders. Normalizes spoken dialects (Bhojpuri, Awadhi, Hindi), auto-routes actions (`/map`, `/farmer-dashboard`), and generates conversational Devanagari Hindi audio text for Text-to-Speech (TTS) playback. |
 
 ---
 

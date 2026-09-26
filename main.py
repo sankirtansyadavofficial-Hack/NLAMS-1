@@ -52,6 +52,11 @@ from execution.portal_navigator_bot import (
     NavigatorChatRequest,
     NavigatorChatResponse
 )
+from execution.voice_query_engine import (
+    process_voice_query,
+    VoiceQueryRequest,
+    VoiceQueryResponse
+)
 
 # Centralized server-side logger
 logger = logging.getLogger("nlams.ai_engine")
@@ -344,6 +349,29 @@ def api_calculate_valuation(request: ValuationRequest):
     except Exception as e:
         logger.error("Valuation calculation failure: %s", str(e), exc_info=True)
         raise HTTPException(status_code=500, detail="Compensation valuation calculation encountered an internal processing error.")
+
+
+# =====================================================================
+# FEATURE 7: NLAMS Dhwani Sahayak (Vernacular Voice-to-Action Engine)
+# =====================================================================
+@app.post(
+    "/api/v1/voice-query",
+    response_model=VoiceQueryResponse,
+    tags=["Feature 7 - Dhwani Sahayak (Vernacular Voice AI)"]
+)
+def api_voice_query(request: VoiceQueryRequest):
+    """
+    Ingests spoken queries (speech transcripts or raw audio base64) from rural landholders,
+    normalizes regional dialects (Hindi, Bhojpuri, Awadhi, Hinglish), executes autonomous
+    actions (portal navigation, status check, dispute guidance), and provides a spoken
+    conversational Devanagari response for Text-to-Speech (TTS) audio readout.
+    """
+    try:
+        response = process_voice_query(request)
+        return response
+    except Exception as e:
+        logger.error("Voice query processing failure: %s", str(e), exc_info=True)
+        raise HTTPException(status_code=500, detail="Voice query processing encountered an internal processing error.")
 
 
 if __name__ == "__main__":
