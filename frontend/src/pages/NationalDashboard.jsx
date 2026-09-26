@@ -11,7 +11,8 @@ import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip,
   ResponsiveContainer, Cell
 } from 'recharts';
-import { MapContainer, TileLayer, GeoJSON } from 'react-leaflet';
+import { MapContainer, TileLayer, GeoJSON, Marker, Popup, useMap } from 'react-leaflet';
+import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import {
   stateData, projects, activityFeed,
@@ -20,6 +21,50 @@ import {
 
 const INDIA_GEOJSON_URL =
   'https://raw.githubusercontent.com/geohacker/india/master/state/india_state.geojson';
+
+// Sharp vector GPS pin with pulse effect for searched plot
+const plotPinIcon = L.divIcon({
+  className: 'custom-plot-pin',
+  html: `
+    <div style="position: relative; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center;">
+      <div style="
+        position: absolute;
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background: rgba(255, 87, 34, 0.45);
+        animation: ping 1.5s cubic-bezier(0, 0, 0.2, 1) infinite;
+      "></div>
+      <div style="
+        width: 30px;
+        height: 30px;
+        background: linear-gradient(135deg, #FF9933 0%, #FF5722 100%);
+        border: 2.5px solid #ffffff;
+        border-radius: 50% 50% 50% 0;
+        transform: rotate(-45deg);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      ">
+        <div style="width: 9px; height: 9px; background: white; border-radius: 50%; transform: rotate(45deg);"></div>
+      </div>
+    </div>
+  `,
+  iconSize: [36, 36],
+  iconAnchor: [18, 36],
+  popupAnchor: [0, -36]
+});
+
+function MapFlyTo({ center, zoom }) {
+  const map = useMap();
+  useEffect(() => {
+    if (center && center[0] && center[1]) {
+      map.flyTo(center, zoom || 16, { duration: 1.5 });
+    }
+  }, [center?.[0], center?.[1], zoom, map]);
+  return null;
+}
 
 // ─── Animated Counter ──────────────────────────────────────────────────────────
 function AnimatedCounter({ end, duration = 2000, prefix = '', suffix = '' }) {
@@ -384,27 +429,66 @@ function PlotSearchMap() {
             dragging={true} zoomControl={true} attributionControl={false}
             style={{ height: '100%', width: '100%' }}
           >
-            <TileLayer url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}" />
+            <TileLayer 
+              url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
+              maxZoom={18}
+            />
+            <MapFlyTo 
+              center={searchedData ? [Number(searchedData.latitude), Number(searchedData.longitude)] : [21.1458, 79.0882]} 
+              zoom={searchedData ? 16 : 14} 
+            />
             {geoData && (
               <GeoJSON
+                key={`parcels-${geoData.features ? geoData.features.length : 'empty'}`}
                 data={geoData}
                 style={(feature) => ({
                   color: feature.properties.owner_color || '#FF9933',
                   weight: 2,
                   fillColor: feature.properties.owner_color || '#FF9933',
-                  fillOpacity: 0.5
+                  fillOpacity: 0.35
                 })}
                 onEachFeature={(feature, layer) => {
                   layer.bindPopup(`
-                    <div style="font-family: sans-serif; color: #1a1a2e;">
-                      <strong>${feature.properties.plot_number}</strong><br/>
-                      Owner: ${feature.properties.owner_name}<br/>
-                      Phone: ${feature.properties.owner_phone}<br/>
-                      Area: ${feature.properties.parcel_area} acres
+                    <div style="font-family: sans-serif; color: #1a1a2e; padding: 4px;">
+                      <strong style="color: #FF5722; font-size: 13px;">${feature.properties.plot_number}</strong><br/>
+                      <b>Owner:</b> ${feature.properties.owner_name}<br/>
+                      <b>Phone:</b> ${feature.properties.owner_phone || 'N/A'}<br/>
+                      <b>Area:</b> ${feature.properties.parcel_area} acres
                     </div>
                   `);
                 }}
               />
+            )}
+            {/* Highlight searched plot boundary polygon */}
+            {searchedData && searchedData.geometry && (
+              <GeoJSON
+                key={`searched-plot-${searchedData.plot_number}`}
+                data={searchedData.geometry}
+                style={{
+                  color: '#FF1744',
+                  weight: 4,
+                  fillColor: '#FF9933',
+                  fillOpacity: 0.65
+                }}
+              />
+            )}
+            {/* Pulsing GPS beacon pin on searched plot */}
+            {searchedData && searchedData.latitude && searchedData.longitude && (
+              <Marker
+                position={[Number(searchedData.latitude), Number(searchedData.longitude)]}
+                icon={plotPinIcon}
+              >
+                <Popup autoPan={false}>
+                  <div style={{ fontFamily: 'sans-serif', color: '#1a1a2e', padding: '4px' }}>
+                    <div style={{ fontWeight: 'bold', color: '#FF5722', fontSize: '13px' }}>{searchedData.plot_number}</div>
+                    <div style={{ fontSize: '11px', marginTop: '2px' }}><b>Owner:</b> {searchedData.owner_name}</div>
+                    <div style={{ fontSize: '11px' }}><b>Area:</b> {searchedData.parcel_area} acres</div>
+                    <div style={{ fontSize: '11px', color: '#16a34a', fontWeight: 'bold' }}>
+                      ₹{Number(searchedData.valuation || 0).toLocaleString('en-IN')}
+                    </div>
+                  </div>
+                </Popup>
+              </Marker>
             )}
           </MapContainer>
         </div>

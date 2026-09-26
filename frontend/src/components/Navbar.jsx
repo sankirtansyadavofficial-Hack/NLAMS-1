@@ -13,7 +13,7 @@ const navLinks = [
     label: 'Platform',
     hasDropdown: true,
     dropdown: [
-      { label: 'Dashboard', icon: <LayoutDashboard size={15} />, path: '/dashboard' },
+      { label: 'Dashboard', icon: <LayoutDashboard size={15} />, path: '/district-dashboard' },
       { label: 'Land Map (GIS)', icon: <Map size={15} />, path: '/map' },
       { label: 'Proposals', icon: <FileText size={15} />, path: '/proposals' },
       { label: 'Compliance', icon: <Shield size={15} />, path: '/compliance' },
@@ -31,6 +31,9 @@ export default function Navbar() {
   const navigate = useNavigate();
   const location = useLocation();
   const { loginWithRedirect, logout, isAuthenticated, user } = useAuth0();
+
+  const isHome = location.pathname === '/';
+  const isNavSolid = scrolled || !isHome;
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 60);
@@ -53,7 +56,7 @@ export default function Navbar() {
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.6, ease: 'easeOut' }}
         className={`fixed top-1 left-0 right-0 z-50 transition-all duration-500 ${
-          scrolled
+          isNavSolid
             ? 'bg-white/95 backdrop-blur-xl shadow-xl border-b border-orange-100'
             : 'bg-transparent'
         }`}
@@ -74,7 +77,7 @@ export default function Navbar() {
               <div>
                 <div
                   className={`font-black text-lg leading-tight tracking-tight ${
-                    scrolled ? 'text-[#003580]' : 'text-white'
+                    isNavSolid ? 'text-[#003580]' : 'text-white'
                   }`}
                 >
                   NLAMS
@@ -97,7 +100,7 @@ export default function Navbar() {
                   {link.hasDropdown ? (
                     <button
                       className={`flex items-center gap-1 px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200
-                        ${scrolled
+                        ${isNavSolid
                           ? 'text-gray-700 hover:text-[#FF9933] hover:bg-orange-50'
                           : 'text-white/90 hover:text-white hover:bg-white/10'
                         }`}
@@ -116,7 +119,7 @@ export default function Navbar() {
                       className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 ${
                         location.pathname === link.path
                           ? 'text-[#FF9933] bg-orange-50'
-                          : scrolled
+                          : isNavSolid
                           ? 'text-gray-700 hover:text-[#FF9933] hover:bg-orange-50'
                           : 'text-white/90 hover:text-white hover:bg-white/10'
                       }`}
@@ -160,7 +163,7 @@ export default function Navbar() {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 className={`p-2.5 rounded-xl transition-all relative ${
-                  scrolled
+                  isNavSolid
                     ? 'text-gray-500 hover:text-[#FF9933] hover:bg-orange-50'
                     : 'text-white/70 hover:text-white hover:bg-white/10'
                 }`}
@@ -174,9 +177,9 @@ export default function Navbar() {
                   <motion.button
                     whileHover={{ scale: 1.04 }}
                     whileTap={{ scale: 0.96 }}
-                    onClick={() => loginWithRedirect()}
+                    onClick={() => loginWithRedirect({ appState: { returnTo: '/district-dashboard' } })}
                     className={`px-5 py-2.5 rounded-xl text-sm font-semibold transition-all border ${
-                      scrolled
+                      isNavSolid
                         ? 'text-[#003580] border-[#003580]/30 hover:bg-[#003580]/5'
                         : 'text-white border-white/30 hover:bg-white/10'
                     }`}
@@ -199,7 +202,7 @@ export default function Navbar() {
                 </>
               ) : (
                 <div className="flex items-center gap-4">
-                  <div className={`flex items-center gap-2 ${scrolled ? 'text-gray-700' : 'text-white'}`}>
+                  <div className={`flex items-center gap-2 ${isNavSolid ? 'text-gray-700' : 'text-white'}`}>
                     <img src={user.picture} alt={user.name} className="w-8 h-8 rounded-full border border-[#FF9933]" />
                     <span className="text-sm font-semibold">{user.name}</span>
                   </div>
@@ -221,7 +224,7 @@ export default function Navbar() {
               whileTap={{ scale: 0.9 }}
               onClick={() => setMobileOpen(!mobileOpen)}
               className={`lg:hidden p-2 rounded-xl transition-all ${
-                scrolled ? 'text-gray-700' : 'text-white'
+                isNavSolid ? 'text-gray-700' : 'text-white'
               }`}
             >
               {mobileOpen ? <X size={22} /> : <Menu size={22} />}
@@ -286,7 +289,7 @@ export default function Navbar() {
                   {!isAuthenticated ? (
                     <>
                       <button
-                        onClick={() => loginWithRedirect()}
+                        onClick={() => loginWithRedirect({ appState: { returnTo: '/district-dashboard' } })}
                         className="w-full py-3 rounded-xl text-sm font-semibold text-[#003580] border border-[#003580]/30 hover:bg-blue-50 transition-all"
                       >
                         Sign In

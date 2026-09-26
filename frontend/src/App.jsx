@@ -10,6 +10,7 @@ import FarmerDashboard from './pages/FarmerDashboard';
 import StateDashboard from './pages/StateDashboard';
 import DistrictDashboard from './pages/DistrictDashboard';
 import NewProposalPage from './pages/NewProposalPage';
+import GisLandMapPage from './pages/GisLandMapPage';
 import FloatingAIBot from './components/FloatingAIBot';
 
 function PageWrapper({ children }) {
@@ -62,7 +63,7 @@ function AppRoutes() {
           <Route path="/state-dashboard" element={<StateDashboard />} />
           <Route path="/district-dashboard" element={<DistrictDashboard />} />
           <Route path="/new-proposal" element={<NewProposalPage />} />
-          <Route path="/map" element={<PageWrapper><PlaceholderPage title="GIS Land Map" /></PageWrapper>} />
+          <Route path="/map" element={<PageWrapper><GisLandMapPage /></PageWrapper>} />
           <Route path="/proposals" element={<PageWrapper><PlaceholderPage title="Proposal Workflow" /></PageWrapper>} />
           <Route path="/compliance" element={<PageWrapper><PlaceholderPage title="Compliance Module" /></PageWrapper>} />
           <Route path="/transparency" element={<PageWrapper><PlaceholderPage title="Transparency Portal" /></PageWrapper>} />

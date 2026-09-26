@@ -7,11 +7,16 @@ import App from './App.jsx'
 const domain = import.meta.env.VITE_AUTH0_DOMAIN;
 const clientId = import.meta.env.VITE_AUTH0_CLIENT_ID;
 
+const onRedirectCallback = (appState) => {
+  window.location.replace(appState?.returnTo || '/district-dashboard');
+};
+
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <Auth0Provider
       domain={domain}
       clientId={clientId}
+      onRedirectCallback={onRedirectCallback}
       authorizationParams={{
         redirect_uri: window.location.origin
       }}
