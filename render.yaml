@@ -1,0 +1,40 @@
+services:
+  # ── Node.js Express Backend ──────────────────────────────────────────────────
+  - type: web
+    name: nlams-backend
+    runtime: node
+    rootDir: backend
+    buildCommand: npm install
+    startCommand: node server.js
+    plan: free
+    envVars:
+      - key: PORT
+        value: 3000
+      - key: DB_USER
+        value: postgres.fpbypfxcmmttpqjgyuxy
+      - key: DB_PASSWORD
+        sync: false        # you will enter this manually in Render dashboard
+      - key: DB_HOST
+        value: aws-0-ap-southeast-1.pooler.supabase.com
+      - key: DB_PORT
+        value: 6543
+      - key: DB_NAME
+        value: postgres
+      - key: FIREBASE_PROJECT_ID
+        value: dummy-id
+      - key: FIREBASE_PRIVATE_KEY
+        value: dummy-key
+      - key: FIREBASE_CLIENT_EMAIL
+        value: dummy@dummy.com
+
+  # ── Python FastAPI AI Engine ─────────────────────────────────────────────────
+  - type: web
+    name: nlams-ai-engine
+    runtime: python
+    rootDir: ai_engine
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+    plan: free
+    envVars:
+      - key: GEMINI_API_KEY
+        sync: false        # you will enter this manually in Render dashboard
