@@ -12,6 +12,8 @@ const onRedirectCallback = (appState) => {
   window.location.hash = appState?.returnTo || '/district-dashboard';
 };
 
+const redirectUri = window.location.origin + (window.location.pathname.includes('/NLAMS-1') ? '/NLAMS-1/' : '/');
+
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <Auth0Provider
@@ -19,7 +21,7 @@ createRoot(document.getElementById('root')).render(
       clientId={clientId}
       onRedirectCallback={onRedirectCallback}
       authorizationParams={{
-        redirect_uri: window.location.origin
+        redirect_uri: redirectUri
       }}
     >
       <App />
