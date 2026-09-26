@@ -11,6 +11,8 @@ import StateDashboard from './pages/StateDashboard';
 import DistrictDashboard from './pages/DistrictDashboard';
 import NewProposalPage from './pages/NewProposalPage';
 import GisLandMapPage from './pages/GisLandMapPage';
+import TransparencyPage from './pages/TransparencyPage';
+import ContactPage from './pages/ContactPage';
 import FloatingAIBot from './components/FloatingAIBot';
 
 function PageWrapper({ children }) {
@@ -66,9 +68,9 @@ function AppRoutes() {
           <Route path="/map" element={<PageWrapper><GisLandMapPage /></PageWrapper>} />
           <Route path="/proposals" element={<PageWrapper><PlaceholderPage title="Proposal Workflow" /></PageWrapper>} />
           <Route path="/compliance" element={<PageWrapper><PlaceholderPage title="Compliance Module" /></PageWrapper>} />
-          <Route path="/transparency" element={<PageWrapper><PlaceholderPage title="Transparency Portal" /></PageWrapper>} />
+          <Route path="/transparency" element={<PageWrapper><TransparencyPage /></PageWrapper>} />
           <Route path="/about" element={<PageWrapper><PlaceholderPage title="About NLAMS" /></PageWrapper>} />
-          <Route path="/contact" element={<PageWrapper><PlaceholderPage title="Contact Us" /></PageWrapper>} />
+          <Route path="/contact" element={<PageWrapper><ContactPage /></PageWrapper>} />
           <Route path="*" element={<PageWrapper><PlaceholderPage title="Page Not Found" /></PageWrapper>} />
         </Routes>
       </AnimatePresence>

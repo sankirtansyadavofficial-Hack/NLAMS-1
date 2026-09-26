@@ -12,6 +12,6 @@ router.get('/:id', controller.getProposalById);
 router.post('/', controller.createProposal);
 
 // PATCH /api/proposals/:id/status — Update proposal status
-router.patch('/:id/status', controller.updateStatus);
+router.patch('/:id/status', controller.updateProposalStatus);
 
 module.exports = router;

@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link, useNavigate } from 'react-router-dom';
 import {
@@ -187,17 +187,41 @@ export default function DistrictDashboard() {
   const navigate = useNavigate();
   const [expandedProposal, setExpandedProposal] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
+  const [proposalsList, setProposalsList] = useState(districtProposals);
+  const [loadingProposals, setLoadingProposals] = useState(true);
+
+  // Fetch proposals live from Supabase backend
+  useEffect(() => {
+    fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3000'}/api/proposals`)
+      .then(res => {
+        if (!res.ok) throw new Error('Failed to fetch');
+        return res.json();
+      })
+      .then(data => {
+        if (Array.isArray(data) && data.length > 0) {
+          setProposalsList(data);
+        }
+      })
+      .catch(err => {
+        console.warn('Using local proposals fallback:', err);
+      })
+      .finally(() => setLoadingProposals(false));
+  }, []);
 
   const profile = districtProfile;
-  const kpi = districtKPI;
+  const kpi = {
+    ...districtKPI,
+    totalProposals: proposalsList.length
+  };
 
   const filteredProposals = useMemo(() => {
-    return districtProposals.filter(p =>
+    return proposalsList.filter(p =>
       !searchTerm ||
-      p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      p.purpose.toLowerCase().includes(searchTerm.toLowerCase())
+      p.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      p.purpose?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      p.id?.toLowerCase().includes(searchTerm.toLowerCase())
     );
-  }, [searchTerm]);
+  }, [searchTerm, proposalsList]);
 
   return (
     <div className="min-h-screen bg-[#FFF8F0] text-[#1a1a2e] relative overflow-hidden">
@@ -368,7 +392,7 @@ export default function DistrictDashboard() {
               <h2 className="text-lg font-black text-[#1a1a2e] flex items-center gap-2">
                 <FileText size={20} className="text-orange-500" />
                 My Submitted Proposals
-                <span className="text-xs font-normal text-gray-500 ml-2">({districtProposals.length} total)</span>
+                <span className="text-xs font-normal text-gray-500 ml-2">({proposalsList.length} total)</span>
               </h2>
               <p className="text-xs text-gray-400 mt-1">Track land acquisition proposals initiated by Pune District Revenue Office</p>
             </div>
