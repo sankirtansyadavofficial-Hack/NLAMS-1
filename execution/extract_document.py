@@ -108,7 +108,13 @@ def deterministic_gazette_parser(
         doc_type = doc_type_hint if doc_type_hint != "AUTO_DETECT" else "GAZETTE_NOTIFICATION_SEC_11"
 
     # 2. Notification Number
-    notif_match = re.search(r"(?:Notification\s*No\.?|अधिसूचना\s*संख्या|Notice\s*No\.?)\s*[:\-]?\s*([A-Za-z0-9\/\-\.]+)", cleaned, re.IGNORECASE)
+    notif_match = re.search(
+        r"(?:Notification\s*(?:No\.?|Number)?|अधिसूचना\s*संख्या|Notice\s*(?:No\.?)?)\s*[:\-]\s*([A-Za-z0-9\/\-\.]+)",
+        cleaned,
+        re.IGNORECASE
+    )
+    if not notif_match:
+        notif_match = re.search(r"(?:Notification\s*No\.?|Notice\s*No\.?)\s*[:\-]?\s*([A-Za-z0-9\/\-\.]+)", cleaned, re.IGNORECASE)
     notif_no = notif_match.group(1).strip() if notif_match else "NLAMS-NOTIF-2026/01"
 
     # 3. Notification Date
